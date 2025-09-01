@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Welcome, <%= user.username %> 🎉</h1>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NearMates - Connect with People Near You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 0;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 10px 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(255,255,255,0.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/><circle cx="700" cy="800" r="80" fill="url(%23a)"/></svg>');
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+            100% { text-shadow: 0 10px 30px rgba(255, 255, 255, 0.3), 0 0 50px rgba(255, 255, 255, 0.2); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-btn.primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-btn.primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-btn.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border: 2px solid transparent;
+        }
+
+        .hero-btn.secondary:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: #f8fafc;
+            position: relative;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+        }
+
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            color: #718096;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .feature-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Features List */
+        .features-list {
+            background: white;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            margin-bottom: 80px;
+        }
+
+        .features-list h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: #f7fafc;
+            transform: translateX(10px);
+        }
+
+        .feature-item-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .feature-item-content h3 {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .feature-item-content p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 80px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="60" cy="90" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: sparkle 10s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Footer */
+        footer {
+            background: #2d3748;
+            color: white;
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-description {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .footer-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #4a5568;
+            padding-top: 20px;
+            margin-top: 40px;
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-list {
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-heart"></i> NearMates
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="/profile" class="nav-btn">Get Started</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Welcome to NearMates</h1>
+            <p>Connect with amazing people near you who share your hobbies and passions. Discover local friends, chat safely, and grow your social circle effortlessly.</p>
+            <div class="hero-buttons">
+                <a href="/map" class="hero-btn primary">
+                    <i class="fas fa-rocket"></i> Start Connecting
+                </a>
+                <a href="#features" class="hero-btn secondary">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Feature Cards -->
+            <div class="feature-grid" id="features">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Start Your Local Connections</h3>
+                    <p class="feature-description">Find friends around your location who love the same things you do—whether it's tech, travel, gaming, or creative hobbies.</p>
+                    <a href="/explore" class="feature-btn">
+                        <i class="fas fa-arrow-right"></i> Explore Nearby Friends
+                    </a>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Location Matching</h3>
+                    <p class="feature-description">Our intelligent system connects you with people in your area who share similar interests, making it easy to meet up and build real friendships.</p>
+                    <a href="/location" class="feature-btn">
+                        <i class="fas fa-compass"></i> Find People Nearby
+                    </a>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Safe & Secure Platform</h3>
+                    <p class="feature-description">Chat and connect with confidence. Our platform ensures your privacy and safety while building meaningful connections with verified users.</p>
+                    <a href="/learnaboutsafety" class="feature-btn">
+                        <i class="fas fa-lock"></i> Learn About Safety
+                    </a>
+                </div>
+            </div>
+
+            <!-- Features List -->
+            <div class="features-list reveal">
+                <h2><i class="fas fa-bolt"></i> What You Can Do Here</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Discover</h3>
+                            <p>Find people nearby using smart location detection and interest matching</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Connect</h3>
+                            <p>Build relationships with users who share your hobbies and passions</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Chat</h3>
+                            <p>Start safe conversations and get to know your potential new friends</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Customize</h3>
+                            <p>Create a detailed profile showcasing your interests and personality</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Build Circle</h3>
+                            <p>Expand your social network with local friends who share your interests</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-icon">
+                            <i class="fas fa-filter"></i>
+                        </div>
+                        <div class="feature-item-content">
+                            <h3>Smart Search</h3>
+                            <p>Filter friends by hobbies, interests, age, and proximity to your location</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <section class="stats-section reveal">
+        <div class="container">
+            <h2 style="font-size: 2.5rem; margin-bottom: 50px; font-weight: 800;">Join Our Growing Community</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Connections Made</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Cities Covered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <h2 class="footer-title">Stay Connected with NearMates</h2>
+            <p class="footer-description">Follow local creators, explore nearby activities, and stay updated with your community!</p>
+            
+            <div class="footer-links">
+                <a href="mailto:2k23.csai2310628@gmail.com" class="footer-link">
+                    <i class="fas fa-envelope"></i>
+                    2k23.csai2310628@gmail.com
+                </a>
+                <a href="tel:+918090279585" class="footer-link">
+                    <i class="fas fa-phone"></i>
+                    +91 8090279585
+                </a>
+                <a href="https://www.linkedin.com/in/kashish-bhadauriya-80781b316/" target="_blank" class="footer-link">
+                    <i class="fab fa-linkedin"></i>
+                    LinkedIn Profile
+                </a>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 NearMates. All rights reserved. Made with ❤️ for connecting people.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Reveal animations on scroll
+        const reveals = document.querySelectorAll('.reveal');
+        
+        function revealOnScroll() {
+            reveals.forEach(reveal => {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveal.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Check on page load
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            const speed = 200;
+
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.innerText.replace(/[^\d]/g, '');
+                    const count = +counter.getAttribute('data-count') || 0;
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        counter.setAttribute('data-count', count + inc);
+                        counter.innerText = Math.ceil(count + inc) + (counter.innerText.includes('K') ? 'K+' : counter.innerText.includes('%') ? '%' : '+');
+                        setTimeout(updateCount, 1);
+                    } else {
+                        counter.innerText = counter.innerText;
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        // Trigger counter animation when stats section is visible
+        const statsSection = document.querySelector('.stats-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        observer.observe(statsSection);
+
+        // Add hover effects to feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-15px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-15px) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Profile</title>
+  <link rel="stylesheet" href="/profile.css">
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(-45deg,#667eea,#764ba2,#f093fb,#f5576c,#4facfe,#00f2fe);
+      background-size: 400% 400%;
+      animation: gradientFlow 15s ease infinite;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh;
+    }
+    @keyframes gradientFlow {
+      0%{background-position:0% 50%;}
+      50%{background-position:100% 50%;}
+      100%{background-position:0% 50%;}
+    }
+    .container {
+      width: 500px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 25px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+      overflow: hidden;
+      padding: 30px 40px;
+      text-align: center;
+    }
+    .profile-header .icon { font-size: 4em; display:block; margin-bottom: 10px; }
+    .profile-header h2 { font-size: 2em; margin-bottom: 30px; }
+    .profile-body { text-align: left; }
+    .profile-item { margin-bottom: 20px; font-size: 16px; }
+    .profile-item strong { color: #667eea; }
+    .profile-actions { display: flex; justify-content: space-between; margin-top: 30px; }
+    .edit-btn, .back-btn { padding: 12px 25px; border-radius: 20px; text-decoration: none; color: white; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; }
+    .edit-btn { background: linear-gradient(135deg,#667eea,#764ba2); }
+    .back-btn { background: linear-gradient(135deg,#f093fb,#f5576c); }
+    .edit-btn:hover, .back-btn:hover { transform: translateY(-2px); }
+    textarea { width: 100%; height: 80px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; resize: none; }
+    input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="profile-header">
+      <span class="icon">👤</span>
+      <h2><%= user.username %></h2>
+    </div>
+
+    <div class="profile-body">
+<form id="profileForm" action="/update-profile" method="POST">
+        <div class="profile-item">
+          <label>Date of Birth:</label>
+          <input type="date" name="dob" value="<%= user.dob || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>Occupation:</label>
+          <input type="text" name="occupation" value="<%= user.occupation || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>State:</label>
+          <input type="text" name="state" value="<%= user.state || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>City:</label>
+          <input type="text" name="city" value="<%= user.city || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>Interests:</label>
+          <input type="text" name="interests" value="<%= user.interests || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>Favorite Sports:</label>
+          <input type="text" name="favSports" value="<%= user.favSports || '' %>">
+        </div>
+
+        <div class="profile-item">
+          <label>About Me:</label>
+          <textarea name="about"><%= user.about || '' %></textarea>
+        </div>
+
+        <div class="profile-actions">
+                    <button type="submit" id="saveBtn" class="edit-btn" style="display:none;">Save Profile</button>
+
+    <button type="button" class="edit-btn" id="editBtn">Edit Profile</button>
+    <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+  </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+const formInputs = document.querySelectorAll('input, textarea');
+const editBtn = document.getElementById('editBtn');
+const saveBtn = document.getElementById('saveBtn');
+
+// Disable all inputs initially
+formInputs.forEach(input => input.disabled = true);
+
+editBtn.addEventListener('click', () => {
+  formInputs.forEach(input => input.disabled = false);
+  editBtn.style.display = 'none';
+  saveBtn.style.display = 'inline-block';
+});
+</script>
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Location Finder</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      background: linear-gradient(-45deg,#667eea,#764ba2,#f093fb,#f5576c,#4facfe,#00f2fe);
+      background-size:400% 400%;
+      animation:gradientFlow 15s ease infinite;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+    @keyframes gradientFlow {
+      0% {background-position:0% 50%;}
+      50% {background-position:100% 50%;}
+      100% {background-position:0% 50%;}
+    }
+
+    .container {
+      width:450px;
+      background:rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-radius:25px;
+      box-shadow:0 25px 80px rgba(0,0,0,0.15),0 0 0 1px rgba(255,255,255,0.2);
+      overflow:hidden;
+      padding:30px 40px;
+      text-align:center;
+      animation:containerEntry 1s ease-out forwards;
+    }
+    @keyframes containerEntry { to { transform: scale(1); } }
+
+    h2 {
+      font-size:2em;
+      margin-bottom:20px;
+      color:#667eea;
+    }
+
+    .geobtn {
+      background:linear-gradient(135deg,#667eea,#764ba2);
+      color:white;
+      border:none;
+      padding:12px 20px;
+      font-size:16px;
+      border-radius:15px;
+      cursor:pointer;
+      margin-bottom:20px;
+      transition:all 0.3s ease;
+    }
+    .geobtn:hover { transform: translateY(-2px); box-shadow:0 10px 30px rgba(102,126,234,0.3); }
+
+    p {
+      font-size:15px;
+      margin:8px 0;
+    }
+
+    iframe {
+      margin-top:15px;
+      border-radius:10px;
+      overflow:hidden;
+      height:250px;
+      width:100%;
+      border:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📍 User Location Finder</h2>
+    <button class="geobtn">Show My Location</button>
+    <p class="showdetails">User location details</p>
+    <p class="fullAddress">User Address</p>
+    <p class="formattedAddress">User Full Address</p>
+    <iframe id="mapFrame" src="" frameborder="0"></iframe>
+  </div>
+
+<script>
+const showdetails = document.querySelector('.showdetails');
+const fullAddress = document.querySelector('.fullAddress');
+const formattedAddress = document.querySelector('.formattedAddress');
+const mapFrame = document.getElementById("mapFrame");
+
+let apiEndpoint = "https://api.opencagedata.com/geocode/v1/json";
+let apikey = "2e2e4f4f6a79488b8b96d54115f5b4b5";
+
+const getUserCurrentAddress = async (latitude, longitude) => {
+  let query = `${latitude}+${longitude}`;
+  let apiUrl = `${apiEndpoint}?key=${apikey}&q=${query}&pretty=1`;
+
+  try {
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+
+    if (data.results.length > 0) {
+      const comp = data.results[0].components;
+      const city = comp.city || comp.town || comp.village || "N/A";
+      const state = comp.state || "N/A";
+      const postcode = comp.postcode || "N/A";
+      const country = comp.country || "N/A";
+
+      fullAddress.textContent = `User address: ${city}, ${state}, ${postcode}, ${country}`;
+      formattedAddress.textContent = `User full address: ${data.results[0].formatted}`;
+    } else {
+      fullAddress.textContent = "No address found!";
+    }
+  } catch (error) {
+    console.log(error);
+    fullAddress.textContent = "Error fetching address";
+  }
+};
+
+document.querySelector('.geobtn').addEventListener('click', () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        showdetails.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+        mapFrame.src = `https://www.google.com/maps?q=${latitude},${longitude}&z=15&output=embed`;
+        getUserCurrentAddress(latitude, longitude);
+      },
+      (error) => {
+        showdetails.textContent = `Error: ${error.message}`;
+        console.log(error.message);
+      },
+      { enableHighAccuracy:true, timeout:5000, maximumAge:0 }
+    );
+  }
+});
+</script>
+</body>
+</html>

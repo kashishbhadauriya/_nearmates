@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About This Page</title>
+  <link rel="stylesheet" href="/aboutSafety.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg,#74ebd5,#ACB6E5);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 30px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 30px;
+      text-align: left;
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #764ba2;
+      margin-top: 25px;
+    }
+
+    p {
+      text-align: justify;
+      line-height: 1.7;
+      margin-bottom: 15px;
+    }
+
+    .slideshow-container {
+      position: relative;
+      max-width: 100%;
+      margin: 20px auto;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .slide { display: none; }
+
+    .slide img { width: 100%; height: auto; display: block; }
+
+    .prev, .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 12px;
+      margin-top: -22px;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      background-color: rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+
+    .next { right: 0; border-radius: 3px 0 0 3px; }
+    .prev:hover, .next:hover { background-color: rgba(0,0,0,0.6); }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: linear-gradient(135deg,#f093fb,#f5576c);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .back-btn:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>About This Page</h1>
+
+    <p>This page is designed to provide users with detailed insights about the platform's safety features and guidelines. It ensures that users understand how to navigate the platform securely, protect personal information, and make informed decisions while interacting with others online.</p>
+
+    <h2>Purpose of the Page</h2>
+    <p>The main goal of this page is to educate users about the importance of digital safety. It covers areas such as privacy, personal information security, account protection, and responsible usage of the platform. By understanding these guidelines, users can minimize risks while exploring platform features.</p>
+
+    <h2>Key Features</h2>
+    <ul>
+      <li><strong>Security Guidelines:</strong> Explains best practices for maintaining account safety.</li>
+      <li><strong>Privacy Awareness:</strong> Shows users what information should remain private.</li>
+      <li><strong>Practical Tips:</strong> Step-by-step instructions to enhance online safety.</li>
+      <li><strong>Visual Aids:</strong> Slideshow with illustrations or screenshots to make concepts easier to understand.</li>
+      <li><strong>Interactive Elements:</strong> Links and buttons to guide users to safety resources.</li>
+    </ul>
+
+    <h2>Why This Page Matters</h2>
+    <p>Digital interactions come with inherent risks, such as sharing personal data or encountering malicious users. This page provides a theoretical and practical framework to ensure users are aware of these risks and equipped to handle them responsibly.</p>
+
+    <h2>Visual Illustrations</h2>
+    <div class="slideshow-container">
+      <div class="slide">
+        <img src="ChatGPT Image Sep 2, 2025, 12_56_12 AM(1).jpg" alt="Safety Tip 1">
+      </div>
+      <div class="slide">
+        <img src="/images/safety2.jpg" alt="Safety Tip 2">
+      </div>
+      <div class="slide">
+        <img src="/images/safety3.jpg" alt="Safety Tip 3">
+      </div>
+      <a class="prev">&#10094;</a>
+      <a class="next">&#10095;</a>
+    </div>
+
+    <h2>Final Recommendations</h2>
+    <p>Always follow the platform's terms of service, avoid sharing sensitive personal details, use strong passwords, enable multi-factor authentication, and report suspicious activity promptly. Educating yourself through this page reduces the risk of digital harm.</p>
+
+    <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+  </div>
+
+  <script>
+    // Slideshow JS
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".slide");
+    const prev = document.querySelector(".prev");
+    const next = document.querySelector(".next");
+
+    function showSlide(n) {
+      slides.forEach(slide => slide.style.display = "none");
+      slideIndex = (n + slides.length) % slides.length;
+      slides[slideIndex].style.display = "block";
+    }
+
+    prev.addEventListener("click", () => showSlide(slideIndex - 1));
+    next.addEventListener("click", () => showSlide(slideIndex + 1));
+
+    function autoShow() {
+      showSlide(slideIndex + 1);
+      setTimeout(autoShow, 5000);
+    }
+
+    showSlide(slideIndex);
+    autoShow();
+  </script>
+</body>
+</html>

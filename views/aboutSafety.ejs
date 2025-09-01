@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(-45deg,#667eea,#764ba2,#f093fb,#f5576c,#4facfe,#00f2fe);
+      background-size:400% 400%;
+      animation:gradientFlow 15s ease infinite;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+    @keyframes gradientFlow {
+      0% {background-position:0% 50%;}
+      50% {background-position:100% 50%;}
+      100% {background-position:0% 50%;}
+    }
+
+    .container {
+      width:650px;
+      background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(20px);
+      border-radius:25px;
+      box-shadow:0 25px 80px rgba(0,0,0,0.15),0 0 0 1px rgba(255,255,255,0.2);
+      overflow:hidden;
+      padding:40px 30px;
+      animation:containerEntry 1s ease-out forwards;
+    }
+    @keyframes containerEntry { to { transform: scale(1); } }
+
+    h1 {
+      color:#667eea;
+      font-size:2.5em;
+      margin-bottom:30px;
+      text-align:center;
+    }
+
+    .section-header {
+      display:flex;
+      align-items:center;
+      cursor:pointer;
+      margin-top:20px;
+      margin-bottom:10px;
+      color:#764ba2;
+      font-size:1.3em;
+      font-weight:600;
+      transition:all 0.3s ease;
+    }
+    .section-header:hover { color:#f093fb; }
+
+    .section-header .icon {
+      font-size:1.5em;
+      margin-right:10px;
+      transition: transform 0.3s ease;
+    }
+
+    .section-content {
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.5s ease;
+      color:#333;
+      font-size:16px;
+      margin-left:25px;
+    }
+
+    .section-content.open { max-height:500px; }
+
+    ul { margin-left:20px; margin-bottom:15px; }
+    li { margin-bottom:8px; }
+
+    .back-btn {
+      display:inline-block;
+      background: linear-gradient(135deg,#f093fb,#f5576c);
+      color:white;
+      padding:12px 25px;
+      border-radius:25px;
+      text-decoration:none;
+      font-weight:600;
+      margin-top:20px;
+      transition:all 0.3s ease;
+    }
+    .back-btn:hover { transform:translateY(-2px); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>About Our Page</h1>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">🛡️</span> Safety & Privacy
+      </div>
+      <div class="section-content">
+        <ul>
+          <li>No personal data is shared without consent.</li>
+          <li>All sensitive information is securely stored.</li>
+          <li>Regular updates maintain platform security.</li>
+          <li>Users can report suspicious activity instantly.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">⚡</span> Features
+      </div>
+      <div class="section-content">
+        <ul>
+          <li>Easy-to-use interface for all users.</li>
+          <li>Real-time updates and notifications.</li>
+          <li>Customizable profiles and preferences.</li>
+          <li>Interactive maps and location features.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">🤝</span> Community Guidelines
+      </div>
+      <div class="section-content">
+        <ul>
+          <li>Respect other users and their opinions.</li>
+          <li>Avoid sharing offensive or harmful content.</li>
+          <li>Follow the rules and report violations.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="icon">❓</span> FAQ
+      </div>
+      <div class="section-content">
+        <p><strong>Q:</strong> Is my data safe?<br> <strong>A:</strong> Yes, we use encryption and secure storage.</p>
+        <p><strong>Q:</strong> Can I delete my account?<br> <strong>A:</strong> Yes, contact support to delete your account.</p>
+      </div>
+    </div>
+
+    <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+  </div>
+
+  <script>
+    const headers = document.querySelectorAll('.section-header');
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.icon');
+        content.classList.toggle('open');
+        icon.style.transform = content.classList.contains('open') ? 'rotate(90deg)' : 'rotate(0deg)';
+      });
+    });
+  </script>
+</body>
+</html>
