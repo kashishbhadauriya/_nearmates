@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About This Page</title>
+  <title>About This Project</title>
   <link rel="stylesheet" href="/aboutSafety.css">
+
+  <!-- ✅ Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -45,38 +49,6 @@
       margin-bottom: 15px;
     }
 
-    .slideshow-container {
-      position: relative;
-      max-width: 100%;
-      margin: 20px auto;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-
-    .slide { display: none; }
-
-    .slide img { width: 100%; height: auto; display: block; }
-
-    .prev, .next {
-      cursor: pointer;
-      position: absolute;
-      top: 50%;
-      width: auto;
-      padding: 12px;
-      margin-top: -22px;
-      color: white;
-      font-weight: bold;
-      font-size: 18px;
-      border-radius: 0 3px 3px 0;
-      user-select: none;
-      background-color: rgba(0,0,0,0.3);
-      transition: 0.3s;
-    }
-
-    .next { right: 0; border-radius: 3px 0 0 3px; }
-    .prev:hover, .next:hover { background-color: rgba(0,0,0,0.6); }
-
     .back-btn {
       display: inline-block;
       margin-top: 20px;
@@ -93,69 +65,109 @@
 </head>
 <body>
   <div class="container">
-    <h1>About This Page</h1>
+    <h1>About NearMates</h1>
 
-    <p>This page is designed to provide users with detailed insights about the platform's safety features and guidelines. It ensures that users understand how to navigate the platform securely, protect personal information, and make informed decisions while interacting with others online.</p>
+    <p>
+      Human connection has always been at the center of our lives. But when people move to a new place, they often feel disconnected from their passions, hobbies, and the communities they once enjoyed. This project has been designed with a very clear goal: 
+      to bring together individuals who share the same interests and make it easy for them to connect, collaborate, and create meaningful relationships. 
+      Whether it is sports, music, art, travel, coding, or simply casual hobbies — this platform ensures that nobody feels left out when they move to a new city or neighborhood. 
+    </p>
 
-    <h2>Purpose of the Page</h2>
-    <p>The main goal of this page is to educate users about the importance of digital safety. It covers areas such as privacy, personal information security, account protection, and responsible usage of the platform. By understanding these guidelines, users can minimize risks while exploring platform features.</p>
-
-    <h2>Key Features</h2>
+    <h2>Core Vision of the Platform</h2>
     <ul>
-      <li><strong>Security Guidelines:</strong> Explains best practices for maintaining account safety.</li>
-      <li><strong>Privacy Awareness:</strong> Shows users what information should remain private.</li>
-      <li><strong>Practical Tips:</strong> Step-by-step instructions to enhance online safety.</li>
-      <li><strong>Visual Aids:</strong> Slideshow with illustrations or screenshots to make concepts easier to understand.</li>
-      <li><strong>Interactive Elements:</strong> Links and buttons to guide users to safety resources.</li>
+      <li><strong>Interest-Based Networking:</strong> People don’t just want random social connections; they want meaningful connections with those who share the same passion. This platform builds communities around hobbies and activities.</li>
+      <li><strong>Reducing Loneliness:</strong> Many individuals feel isolated when shifting to a new environment. By joining groups and meeting like-minded individuals, they instantly feel at home.</li>
+      <li><strong>Encouraging Collaboration:</strong> From forming a local football team to creating a coding club, the platform gives people the tools to turn ideas into real activities.</li>
+      <li><strong>Safe & Inclusive Environment:</strong> Designed to prioritize digital safety, user privacy, and respectful communication.</li>
     </ul>
 
-    <h2>Why This Page Matters</h2>
-    <p>Digital interactions come with inherent risks, such as sharing personal data or encountering malicious users. This page provides a theoretical and practical framework to ensure users are aware of these risks and equipped to handle them responsibly.</p>
+    <h2>Why This Project is Needed</h2>
+    <p>
+      Imagine moving to a completely new city. You want to play badminton, but you don’t know anyone around. Or perhaps you are passionate about photography but have no clue where to find a community of photographers nearby. 
+      In such cases, most people end up leaving their passions behind. This platform solves that exact problem by showing you who around you shares the same interest. 
+      You can directly connect with them, chat, form groups, and start engaging in your hobbies again — without waiting for months to discover people organically.
+    </p>
 
-    <h2>Visual Illustrations</h2>
-    <div class="slideshow-container">
-      <div class="slide">
-        <img src="ChatGPT Image Sep 2, 2025, 12_56_12 AM(1).jpg" alt="Safety Tip 1">
+    <!-- ✅ Bootstrap Carousel -->
+    <div id="carouselOne" class="carousel slide my-4" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="https://images.unsplash.com/photo-1508780709619-79562169bc64" class="d-block w-100" alt="Community Gathering">
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f" class="d-block w-100" alt="Sports Activity">
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1533745848184-3db07256e163" class="d-block w-100" alt="Collaboration">
+        </div>
       </div>
-      <div class="slide">
-        <img src="/images/safety2.jpg" alt="Safety Tip 2">
-      </div>
-      <div class="slide">
-        <img src="/images/safety3.jpg" alt="Safety Tip 3">
-      </div>
-      <a class="prev">&#10094;</a>
-      <a class="next">&#10095;</a>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselOne" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselOne" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
     </div>
 
-    <h2>Final Recommendations</h2>
-    <p>Always follow the platform's terms of service, avoid sharing sensitive personal details, use strong passwords, enable multi-factor authentication, and report suspicious activity promptly. Educating yourself through this page reduces the risk of digital harm.</p>
+    <h2>Key Benefits</h2>
+    <p>Here are the major benefits that make this project stand out:</p>
+    <ul>
+      <li>Find people around you with the <strong>exact same interests</strong>.</li>
+      <li>Start conversations and plan activities without hesitation.</li>
+      <li>Form <strong>small communities</strong> based on hobbies like cricket, chess, coding, or singing.</li>
+      <li>Get notifications about <strong>local meetups and events</strong>.</li>
+      <li>Reduce feelings of isolation and boost <strong>mental well-being</strong>.</li>
+      <li>Encourage cultural exchange when people from different backgrounds come together.</li>
+    </ul>
+
+    <h2>Practical Use Cases</h2>
+    <p>To better understand the platform, let us take some examples:</p>
+    <ul>
+      <li><strong>A Sport Enthusiast:</strong> A student moves to a new city for college. They love football but have no team. By using this platform, they instantly find other football lovers nearby and start playing again.</li>
+      <li><strong>A Music Lover:</strong> Someone with a passion for guitar playing finds others interested in jamming sessions and starts forming a music circle.</li>
+      <li><strong>A Tech Learner:</strong> A beginner in coding discovers peers interested in hackathons and builds projects together.</li>
+      <li><strong>Fitness Conscious Individuals:</strong> People looking for morning jogging partners or gym buddies quickly connect.</li>
+    </ul>
+
+    <!-- ✅ Another Slideshow -->
+    <div id="carouselTwo" class="carousel slide my-4" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b" class="d-block w-100" alt="Teamwork">
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0" class="d-block w-100" alt="Friendship">
+        </div>
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d" class="d-block w-100" alt="Community Event">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselTwo" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselTwo" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+
+    <h2>Why It Matters</h2>
+    <p>
+      In today’s fast-paced world, digital platforms are usually blamed for reducing real-world interaction. But this project takes a different route. It uses technology not to separate people, but to bring them together in real life. 
+      It bridges the gap between online discovery and offline connection. By focusing on shared interests, it ensures conversations and meetups are more natural, engaging, and meaningful. 
+      Over time, this creates stronger communities and makes cities feel smaller, friendlier, and more welcoming.
+    </p>
+
+    <h2>Final Words</h2>
+    <p>
+      This project is more than just a communication tool — it is a movement towards a connected society where no passion is left unexplored and no person feels disconnected. 
+      From sports and hobbies to professional skills and casual meetups, the platform is built to give everyone a chance to belong. 
+      It proves that no matter where you are, you can always find people who share your interests and passions. 
+    </p>
 
     <a href="/dashboard" class="back-btn">Back to Dashboard</a>
   </div>
 
-  <script>
-    // Slideshow JS
-    let slideIndex = 0;
-    const slides = document.querySelectorAll(".slide");
-    const prev = document.querySelector(".prev");
-    const next = document.querySelector(".next");
-
-    function showSlide(n) {
-      slides.forEach(slide => slide.style.display = "none");
-      slideIndex = (n + slides.length) % slides.length;
-      slides[slideIndex].style.display = "block";
-    }
-
-    prev.addEventListener("click", () => showSlide(slideIndex - 1));
-    next.addEventListener("click", () => showSlide(slideIndex + 1));
-
-    function autoShow() {
-      showSlide(slideIndex + 1);
-      setTimeout(autoShow, 5000);
-    }
-
-    showSlide(slideIndex);
-    autoShow();
-  </script>
+  <!-- ✅ Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

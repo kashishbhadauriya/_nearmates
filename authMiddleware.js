@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const secret = process.env.JWT_SECRET || "superSecretKey";
 
 // Create JWT token for a user
@@ -13,7 +13,8 @@ function createTokenForUser(user) {
 
 // Middleware to check authentication
 function checkForAuthentication(req, res, next) {
-  const token = req.cookies?.token || req.headers['authorization']?.split(' ')[1];
+  const token =
+    req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
     req.user = null;
@@ -32,5 +33,4 @@ function checkForAuthentication(req, res, next) {
 
 // Middleware to authorize based on roles
 
-
-module.exports = { createTokenForUser, checkForAuthentication};
+module.exports = { createTokenForUser, checkForAuthentication };

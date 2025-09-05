@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Locations</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f4f7fb;
+      text-align: center;
+      color: #333;
+    }
+    h2 {
+      margin: 20px 0;
+      font-weight: 600;
+      color: #444;
+    }
+    #map { 
+      height: 85vh; 
+      width: 90%; 
+      margin: auto;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .leaflet-popup-content {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+    .leaflet-popup-content b {
+      color: #0077ff;
+    }
+    .chat-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 12px;
+      background: #0077ff;
+      color: white;
+      border-radius: 8px;
+      font-size: 13px;
+      text-decoration: none;
+      transition: background 0.2s ease-in-out;
+    }
+    .chat-btn:hover {
+      background: #0056cc;
+    }
+    .legend {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 14px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h2>📍 User Locations (within 5 km)</h2>
+  <div id="map"></div>
+  <div class="legend">
+    <b>Legend</b><br>
+    🔵 User Location <br>
+    ⚪ Cluster Group
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+  <script>
+    // Initialize map (India centered)
+    var map = L.map('map').setView([20.5937, 78.9629], 5);
+
+    // Light-themed tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Marker cluster group
+    var markers = L.markerClusterGroup();
+
+    // Custom blue marker icon
+    var blueIcon = new L.Icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -28]
+    });
+
+    // Function to calculate distance (Haversine formula)
+    function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance in km
+    }
+
+    // Get current user location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        let myLat = position.coords.latitude;
+        let myLng = position.coords.longitude;
+
+        // Add a marker for current user
+        L.marker([myLat, myLng])
+          .addTo(map)
+          .bindPopup("<b>You are here</b>")
+          .openPopup();
+
+        map.setView([myLat, myLng], 13);
+
+        // Fetch other users
+        fetch("/api/locations")
+          .then(res => res.json())
+          .then(users => {
+            users.forEach(user => {
+              if (user.location && user.location.latitude && user.location.longitude) {
+                let dist = getDistanceFromLatLon(
+                  myLat, myLng,
+                  user.location.latitude, user.location.longitude
+                );
+                if (dist <= 15) { // Only show within 15km
+                  var marker = L.marker([user.location.latitude, user.location.longitude], { icon: blueIcon })
+                    .bindPopup(`
+                      <b>${user.name}</b><br>
+                      🏀 Sport: ${user.interests || "Not specified"} <br>
+                      📍 Distance: ${dist.toFixed(2)} km<br>
+                      <a href="/chat/${user._id}" class="chat-btn">💬 Chat</a>
+                    `);
+                  markers.addLayer(marker);
+                }
+              }
+            });
+            map.addLayer(markers);
+          })
+          .catch(err => console.error("Failed to fetch locations:", err));
+      });
+    } else {
+      alert("Geolocation not supported by this browser.");
+    }
+  </script>
+</body>
+</html>

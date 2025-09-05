@@ -76,6 +76,45 @@
           <input type="text" name="interests" value="<%= user.interests || '' %>">
         </div>
 
+
+        <div class="profile-item">
+  <label>Location:</label>
+  <a href="#" id="location-btn" class="back-btn">On</a>
+</div>
+
+<script>
+  document.getElementById("location-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          alert(" Location Access Granted\nLat: " + position.coords.latitude + 
+                "\nLng: " + position.coords.longitude);
+          fetch("/save-location", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          });
+        },
+        function (error) {
+          if (error.code === error.PERMISSION_DENIED) {
+            alert(" Location Access Denied");
+          } else {
+            alert(" Error getting location");
+          }
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  });
+</script>
+
+
         <div class="profile-item">
           <label>Favorite Sports:</label>
           <input type="text" name="favSports" value="<%= user.favSports || '' %>">
@@ -87,7 +126,7 @@
         </div>
 
         <div class="profile-actions">
-                    <button type="submit" id="saveBtn" class="edit-btn" style="display:none;">Save Profile</button>
+         <button type="submit" id="saveBtn" class="edit-btn" style="display:none;">Save Profile</button>
 
     <button type="button" class="edit-btn" id="editBtn">Edit Profile</button>
     <a href="/dashboard" class="back-btn">Back to Dashboard</a>
