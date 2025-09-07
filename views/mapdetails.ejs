@@ -140,7 +140,7 @@
                   myLat, myLng,
                   user.location.latitude, user.location.longitude
                 );
-                if (dist <= 15) { // Only show within 15km
+                if (dist <= 1500) { 
                   var marker = L.marker([user.location.latitude, user.location.longitude], { icon: blueIcon })
                     .bindPopup(`
                       <b>${user.name}</b><br>
