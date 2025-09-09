@@ -50,7 +50,23 @@
     </div>
 
     <div class="profile-body">
-<form id="profileForm" action="/update-profile" method="POST">
+      <!-- enctype is required for file upload -->
+      <form id="profileForm" action="/update-profile" method="POST" enctype="multipart/form-data">
+        
+        <!-- Profile Picture Upload -->
+        <div class="profile-item" style="text-align:center;">
+          <label>Profile Picture:</label>
+          <div>
+            <img id="dpPreview" 
+                 src="<%= user.dp || '/default-dp.png' %>" 
+                 alt="Profile Picture" 
+                 style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin:10px auto; display:block; border:2px solid #667eea; cursor:pointer;">
+          </div>
+          <input type="file" name="dp" id="dpUpload" accept="image/*" style="display:none;">
+          <button type="button" class="edit-btn" id="uploadBtn">Upload DP</button>
+        </div>
+
+        <!-- Other Profile Fields -->
         <div class="profile-item">
           <label>Date of Birth:</label>
           <input type="date" name="dob" value="<%= user.dob || '' %>">
@@ -76,44 +92,11 @@
           <input type="text" name="interests" value="<%= user.interests || '' %>">
         </div>
 
-
+        <!-- Location -->
         <div class="profile-item">
-  <label>Location:</label>
-  <a href="#" id="location-btn" class="back-btn">On</a>
-</div>
-
-<script>
-  document.getElementById("location-btn").addEventListener("click", function (e) {
-    e.preventDefault();
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function (position) {
-          alert(" Location Access Granted\nLat: " + position.coords.latitude + 
-                "\nLng: " + position.coords.longitude);
-          fetch("/save-location", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            })
-          });
-        },
-        function (error) {
-          if (error.code === error.PERMISSION_DENIED) {
-            alert(" Location Access Denied");
-          } else {
-            alert(" Error getting location");
-          }
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  });
-</script>
-
+          <label>Location:</label>
+          <a href="#" id="location-btn" class="back-btn">On</a>
+        </div>
 
         <div class="profile-item">
           <label>Favorite Sports:</label>
@@ -125,31 +108,85 @@
           <textarea name="about"><%= user.about || '' %></textarea>
         </div>
 
+        <!-- Action Buttons -->
         <div class="profile-actions">
-         <button type="submit" id="saveBtn" class="edit-btn" style="display:none;">Save Profile</button>
-
-    <button type="button" class="edit-btn" id="editBtn">Edit Profile</button>
-    <a href="/dashboard" class="back-btn">Back to Dashboard</a>
-  </div>
+          <button type="submit" id="saveBtn" class="edit-btn" style="display:none;">Save Profile</button>
+          <button type="button" class="edit-btn" id="editBtn">Edit Profile</button>
+          <a href="/dashboard" class="back-btn">Back to Dashboard</a>
+        </div>
       </form>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script>
-const formInputs = document.querySelectorAll('input, textarea');
-const editBtn = document.getElementById('editBtn');
-const saveBtn = document.getElementById('saveBtn');
+    // Disable inputs initially
+    const formInputs = document.querySelectorAll('input, textarea');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
 
-// Disable all inputs initially
-formInputs.forEach(input => input.disabled = true);
+    formInputs.forEach(input => input.disabled = true);
 
-editBtn.addEventListener('click', () => {
-  formInputs.forEach(input => input.disabled = false);
-  editBtn.style.display = 'none';
-  saveBtn.style.display = 'inline-block';
-});
-</script>
+    editBtn.addEventListener('click', () => {
+      formInputs.forEach(input => input.disabled = false);
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'inline-block';
+    });
 
+    // Location script
+    document.getElementById("location-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            alert(" Location Access Granted\nLat: " + position.coords.latitude + 
+                  "\nLng: " + position.coords.longitude);
+            fetch("/save-location", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              })
+            });
+          },
+          function (error) {
+            if (error.code === error.PERMISSION_DENIED) {
+              alert(" Location Access Denied");
+            } else {
+              alert(" Error getting location");
+            }
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    });
+
+    // DP Upload + Preview
+    const dpUpload = document.getElementById("dpUpload");
+    const dpPreview = document.getElementById("dpPreview");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    uploadBtn.addEventListener("click", () => {
+      dpUpload.click();
+    });
+
+    dpPreview.addEventListener("click", () => {
+      dpUpload.click();
+    });
+
+    dpUpload.addEventListener("change", () => {
+      const file = dpUpload.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          dpPreview.src = e.target.result; // Show preview
+          uploadBtn.textContent = "Change DP";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
   </script>
 </body>
 </html>

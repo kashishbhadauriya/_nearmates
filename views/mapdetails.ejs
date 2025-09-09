@@ -7,8 +7,6 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-  <!-- MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
 
@@ -54,55 +52,25 @@
     .chat-btn:hover {
       background: #0056cc;
     }
-    .legend {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      background: white;
-      padding: 12px 18px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      font-size: 14px;
-      text-align: left;
-    }
   </style>
 </head>
 <body>
   <h2>📍 User Locations (within 100 km)</h2>
   <div id="map"></div>
-  <div class="legend">
-    <b>Legend</b><br>
-    🔵 User Location <br>
-    ⚪ Cluster Group
-  </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- MarkerCluster JS -->
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
   <script>
-    // Initialize map (India centered)
     var map = L.map('map').setView([20.5937, 78.9629], 5);
-
-    // Light-themed tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19
     }).addTo(map);
 
-    // Marker cluster group
     var markers = L.markerClusterGroup();
+    var defaultIcon = '/uploads/icon.png'; // Default icon if DP not uploaded
 
-    // Custom blue marker icon
-    var blueIcon = new L.Icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -28]
-    });
-
-    // Function to calculate distance (Haversine formula)
     function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
       const R = 6371; // Earth radius in km
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -113,49 +81,75 @@
         Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c; // Distance in km
+      return R * c; 
     }
 
-    // Get current user location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
         let myLat = position.coords.latitude;
         let myLng = position.coords.longitude;
 
-        // Add a marker for current user
-        L.marker([myLat, myLng])
-          .addTo(map)
+        // Current user marker
+        const currentUserIcon = L.divIcon({
+          className: 'current-user-icon',
+          html: `<img src="/uploads/locationicon.png" alt="You" style="width:45px;height:45px;border-radius:50%;border:3px solid red;object-fit:cover;">`,
+          iconSize: [45,45],
+          iconAnchor: [22,45]
+        });
+        L.marker([myLat, myLng], {icon: currentUserIcon}).addTo(map)
           .bindPopup("<b>You are here</b>")
           .openPopup();
 
         map.setView([myLat, myLng], 13);
+
+        // Save current user location to DB
+        fetch('/save-location', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latitude: myLat, longitude: myLng })
+        }).catch(err => console.error(err));
 
         // Fetch other users
         fetch("/api/locations")
           .then(res => res.json())
           .then(users => {
             users.forEach(user => {
-              if (user.location && user.location.latitude && user.location.longitude) {
-                let dist = getDistanceFromLatLon(
-                  myLat, myLng,
-                  user.location.latitude, user.location.longitude
-                );
-                if (dist <= 100) { 
-                  var marker = L.marker([user.location.latitude, user.location.longitude], { icon: blueIcon })
-                    .bindPopup(`
-                      <b>${user.name}</b><br>
-                      🏀 Sport: ${user.interests || "Not specified"} <br>
-                      📍 Distance: ${dist.toFixed(2)} km<br>
-                      <a href="/chat/${user._id}" class="chat-btn">💬 Chat</a>
-                    `);
-                  markers.addLayer(marker);
-                }
+              if (!user.location || !user.location.latitude || !user.location.longitude) return;
+
+              let dist = getDistanceFromLatLon(
+                myLat, myLng,
+                user.location.latitude, user.location.longitude
+              );
+
+              if (dist <= 100) {
+                const dp = user.dp || defaultIcon;
+
+                // User DP as marker icon
+                const userIcon = L.divIcon({
+                  className: 'user-icon',
+                  html: `<img src="${dp}" alt="${user.name}" style="width:40px;height:40px;border-radius:50%;border:2px solid #0077ff;object-fit:cover;">`,
+                  iconSize: [40,40],
+                  iconAnchor: [20,40],
+                  popupAnchor: [0,-40]
+                });
+
+                const popupHTML = `
+                  <b>${user.name}</b><br>
+                  🏀 Sport: ${user.interests || "Not specified"} <br>
+                  📍 Distance: ${dist.toFixed(2)} km<br>
+                  <a href="/chat/${user._id}" class="chat-btn">💬 Chat</a>
+                `;
+
+                L.marker([user.location.latitude, user.location.longitude], { icon: userIcon })
+                  .bindPopup(popupHTML)
+                  .addTo(markers);
               }
             });
+
             map.addLayer(markers);
           })
           .catch(err => console.error("Failed to fetch locations:", err));
-      });
+      }, () => alert("Geolocation not supported or permission denied!"));
     } else {
       alert("Geolocation not supported by this browser.");
     }
