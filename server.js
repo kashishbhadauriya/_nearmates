@@ -30,13 +30,24 @@ app.use(
 app.use(checkForAuthentication);
 
 // ✅ Connect database
+// ✅ Connect database
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error(" MongoDB Error:", err));
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+
+    // Start server ONLY after DB is connected
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB Error:", err);
+  });
+
 
 // ✅ Schema
 const UserSchema = new mongoose.Schema({
@@ -196,6 +207,10 @@ app.get("/mapdetails", async (req, res) => {
   }
 });
 
+
+
+
+
 app.get("/about", (req, res) => {
   if (!req.session.user) return res.redirect("/");
   res.render("about", { user: req.session.user });
@@ -224,7 +239,7 @@ app.get("/api/locations", async (req, res) => {
   try {
     const users = await User.find(
       { "location.latitude": { $exists: true }, "location.longitude": { $exists: true } },
-      { name: 1, location: 1, interests: 1 , dp: 1 }
+      { name: 1, location: 1, interests: 1, dp: 1 }
     );
     res.json(users);
   } catch (err) {
@@ -232,6 +247,9 @@ app.get("/api/locations", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch locations" });
   }
 });
+
+
+
 
 // ================== LOGOUT ==================
 app.get("/logout", (req, res) => {
