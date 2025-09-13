@@ -11,14 +11,12 @@ const { createTokenForUser, checkForAuthentication } = require("./authMiddleware
 const app = express();
 const PORT = 3000;
 
-// Middleware setup
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use("/uploads", express.static("uploads")); // ✅ serve uploaded images
+app.use("/uploads", express.static("uploads")); 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Session setup 
 app.use(
   session({
     secret: "secretKey",
@@ -29,8 +27,6 @@ app.use(
 
 app.use(checkForAuthentication);
 
-// ✅ Connect database
-// ✅ Connect database
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -49,7 +45,7 @@ mongoose
   });
 
 
-// ✅ Schema
+
 const UserSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -61,7 +57,7 @@ const UserSchema = new mongoose.Schema({
   interests: String,
   favSports: String,
   about: String,
-  dp: String, // ✅ new field for profile picture
+  dp: String,
   location: {
     latitude: Number,
     longitude: Number,
@@ -70,9 +66,8 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-// ================== AUTH ROUTES ==================
 
-// Get for login
+
 app.get("/", (req, res) => {
   res.render("login", { error: null });
 });
@@ -125,10 +120,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ================== MULTER SETUP ==================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // make sure uploads/ folder exists
+    cb(null, "uploads/"); 
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -136,7 +130,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ================== PROFILE ROUTES ==================
 
 // Profile 
 app.get("/profile", async (req, res) => {
@@ -239,7 +232,7 @@ app.get("/api/locations", async (req, res) => {
   try {
     const users = await User.find(
       { "location.latitude": { $exists: true }, "location.longitude": { $exists: true } },
-      { name: 1, location: 1, interests: 1, dp: 1 }
+      { name: 1, location: 1, interests: 1, dp: 1 }//1 refers to include these fields in the result
     );
     res.json(users);
   } catch (err) {
@@ -251,7 +244,6 @@ app.get("/api/locations", async (req, res) => {
 
 
 
-// ================== LOGOUT ==================
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
