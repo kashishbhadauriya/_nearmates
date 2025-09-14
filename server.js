@@ -243,7 +243,6 @@ app.get("/api/locations", async (req, res) => {
 
 
 
-
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
