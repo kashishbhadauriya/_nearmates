@@ -1,7 +1,5 @@
+[![🚀 Live Demo](https://img.shields.io/badge/Live%20Demo-Visit-blue?style=for-the-badge)](https://nearmates-kd02.onrender.com)
 
-🌐 Live Demo
-
-🚀 NearMates on Render
 
 NearMates is a location-based social networking web app 🌍 that helps you discover and connect with people nearby who share your interests. You can see nearby users, check their interests, and start chatting instantly! 💬✨
 
