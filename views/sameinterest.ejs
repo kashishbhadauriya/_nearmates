@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users with Same Interest</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .error, .no-users {
+      font-size: 1.2rem;
+      color: #ffdddd;
+      background: rgba(0,0,0,0.3);
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .users-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .user-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      width: 250px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    }
+
+    .user-card img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      margin-bottom: 15px;
+    }
+
+    .user-card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      color: #fff;
+    }
+
+    .user-card p {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      color: #f0f0f0;
+    }
+
+    .chat-btn {
+      display: inline-block;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .chat-btn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    }
+
+    @media (max-width: 600px) {
+      .user-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Users with the same interest:</h1>
+
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } else if (users.length === 0) { %>
+    <div class="no-users">No users found with the same interest.</div>
+  <% } else { %>
+    <div class="users-list">
+      <% users.forEach(function(user) { %>
+        <div class="user-card">
+          <img src="<%= user.dp || '/uploads/icon.png' %>" alt="<%= user.name %>">
+          <h2><%= user.name %></h2>
+          <p><strong>Interest:</strong> <%= user.interests %></p>
+          <p><strong>City:</strong> <%= user.city || 'Not specified' %></p>
+          <p><strong>About:</strong> <%= user.about || 'No info' %></p>
+          <a href="/chat/<%= user._id %>" class="chat-btn">💬 Send Friend Request</a>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</body>
+</html>

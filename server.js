@@ -241,6 +241,49 @@ app.get("/api/locations", async (req, res) => {
   }
 });
 
+// server.js / routes.js
+
+
+
+
+
+
+
+app.get("/sameinterest", async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/");
+    }
+
+    const currentUser = await User.findOne({ email: req.session.user.email });
+
+    if (!currentUser) {
+      return res.redirect("/"); // or show some error page
+    }
+
+    // Find users with the same interest, excluding current user
+    const users = await User.find({
+      interests: currentUser.interests,
+      _id: { $ne: currentUser._id }
+    });
+
+    if (!users || users.length === 0) {
+      // No user with same interest, redirect/render alluser
+      const allUsers = await User.find({ _id: { $ne: currentUser._id } });
+      return res.render("alluser", { users: allUsers, message: "No users found with your interest." });
+    }
+
+    // Users with same interest found
+    res.render("sameinterest", { users, error: null });
+
+  } catch (err) {
+    console.error(err);
+    res.render("sameinterest", { users: [], error: "Failed to load users" });
+  }
+});
+
+
+
 
 
 app.get("/logout", (req, res) => {
@@ -248,7 +291,7 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-// ================== START SERVER ==================
+
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
