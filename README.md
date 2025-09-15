@@ -1,5 +1,7 @@
 
+## 🌐 Live Demo
 
+[🚀 Check out NearMates Live](https://nearmates-kd02.onrender.com)
 
 NearMates is a location-based social networking web app 🌍 that helps you discover and connect with people nearby who share your interests. You can see nearby users, check their interests, and start chatting instantly! 💬✨
 
