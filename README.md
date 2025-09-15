@@ -1,6 +1,7 @@
-🌐 NearMates
-Live Demo
-🚀 Live Demo
+
+🌐 Live Demo
+
+🚀 NearMates on Render
 
 NearMates is a location-based social networking web app 🌍 that helps you discover and connect with people nearby who share your interests. You can see nearby users, check their interests, and start chatting instantly! 💬✨
 
