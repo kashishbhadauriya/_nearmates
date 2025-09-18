@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NearMates - Friends & Requests</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --primary-color: #6366f1;
+      --secondary-color: #f8fafc;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--secondary-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .nav-btn {
+      padding: 10px 20px !important;
+      border-radius: 25px;
+      background: var(--primary-gradient);
+      color: white !important;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+      color: white !important;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1200px;
+      margin: 100px auto 50px;
+      padding: 0 24px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    /* Section Separation */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 4px;
+      background: var(--primary-gradient);
+      border-radius: 2px;
+      margin: 48px auto;
+    }
+
+    /* Cards Container */
+    .cards-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .user-list {
+      list-style: none;
+      display: grid;
+      gap: 16px;
+    }
+
+    /* User Card */
+    .user-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .user-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-gradient);
+      transform: scaleY(0);
+      transition: var(--transition);
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .user-card:hover::before {
+      transform: scaleY(1);
+    }
+
+    /* User Info */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    .user-card:hover .user-avatar {
+      border-color: var(--primary-color);
+    }
+
+    .user-details h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .user-details .user-email {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-accept {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .btn-accept:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-reject {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .btn-reject:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .btn-chat {
+      background: var(--primary-gradient);
+      color: white;
+    }
+
+    .btn-chat:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      background: white;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin: 0 auto;
+      max-width: 500px;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    /* Stats Cards */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 16px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .main-container {
+        margin-top: 80px;
+        padding: 0 16px;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+      }
+
+      .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <i class="fas fa-heart"></i>
+      NearMates
+    </div>
+    <ul class="nav-links">
+      <li><a href="/dashboard">Home</a></li>
+      <li><a href="/friendRequest">Friend Requests</a></li>
+    </ul>
+  </nav>
+
+  <div class="main-container">
+    <!-- Stats Overview -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number"><%= requests.length %></div>
+        <div class="stat-label">Pending Requests</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number"><%= friends.length %></div>
+        <div class="stat-label">Connected Friends</div>
+      </div>
+    </div>
+
+    <!-- Friend Requests Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Friend Requests</h2>
+        <p class="section-subtitle">People who want to connect with you</p>
+      </div>
+
+      <div class="cards-container">
+        <% if (requests.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <p class="empty-text">
+              No pending friend requests at the moment.<br>
+              Check back later for new connections!
+            </p>
+          </div>
+        <% } else { %>
+          <ul class="user-list">
+            <% requests.forEach(user => { %>
+              <li class="user-card">
+                <div class="user-info">
+                  <% if(user.dp) { %>
+                    <img src="<%= user.dp %>" alt="<%= user.name %>'s profile" class="user-avatar">
+                  <% } else { %>
+                    <div class="user-avatar" style="background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                      <%= user.name.charAt(0).toUpperCase() %>
+                    </div>
+                  <% } %>
+                  <div class="user-details">
+                    <h3><%= user.name %></h3>
+                    <div class="user-email"><%= user.email %></div>
+                  </div>
+                </div>
+                <div class="action-buttons">
+                  <form action="/friend-request/accept/<%= user._id %>" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-accept">
+                      <i class="fas fa-check"></i>
+                      Accept
+                    </button>
+                  </form>
+                  <form action="/friend-request/reject/<%= user._id %>" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-reject">
+                      <i class="fas fa-times"></i>
+                      Decline
+                    </button>
+                  </form>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Friends Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Your Friends</h2>
+        <p class="section-subtitle">Your connected network</p>
+      </div>
+
+      <div class="cards-container">
+        <% if (friends.length === 0) { %>
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <p class="empty-text">
+              No friends connected yet.<br>
+              Accept friend requests above to start building your network!
+            </p>
+          </div>
+        <% } else { %>
+          <ul class="user-list">
+            <% friends.forEach(friend => { %>
+              <li class="user-card">
+                <div class="user-info">
+                  <% if(friend.dp) { %>
+                    <img src="<%= friend.dp %>" alt="<%= friend.name %>'s profile" class="user-avatar">
+                  <% } else { %>
+                    <div class="user-avatar" style="background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                      <%= friend.name.charAt(0).toUpperCase() %>
+                    </div>
+                  <% } %>
+                  <div class="user-details">
+                    <h3><%= friend.name %></h3>
+                    <div class="user-email"><%= friend.email %></div>
+                  </div>
+                </div>
+                <div class="action-buttons">
+                  <form action="/chat/<%= friend._id %>" method="GET" style="display: inline;">
+                    <button type="submit" class="btn btn-chat">
+                      <i class="fas fa-comment"></i>
+                      Chat
+                    </button>
+                  </form>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

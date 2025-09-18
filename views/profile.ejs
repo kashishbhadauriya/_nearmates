@@ -520,7 +520,7 @@
           <div class="avatar-ring">
             <img id="dpPreview" 
                  src="<%= user.dp || '/default-dp.png' %>" 
-                 alt="Profile Picture">
+                 alt="">
           </div>
           <div class="upload-overlay">
             📸
@@ -584,14 +584,16 @@
           </div>
 
           <div class="action-section">
-            <button type="submit" id="saveBtn" class="action-btn btn-primary hidden">💾 Save Changes</button>
-            <button type="button" id="editBtn" class="action-btn btn-primary">✏️ Edit Profile</button>
-            <a href="/dashboard" class="action-btn btn-secondary">🏠 Dashboard</a>
+            <button type="submit" id="saveBtn" class="action-btn btn-primary hidden"> Save Changes</button>
+            <button type="button" id="editBtn" class="action-btn btn-primary"> Edit Profile</button>
+            <a href="/dashboard" class="action-btn btn-secondary"> Dashboard</a>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+
 
   <!-- Scripts -->
   <script>
@@ -720,16 +722,12 @@
       });
     });
 
-    // Form submission with visual feedback
     document.getElementById('profileForm').addEventListener('submit', function(e) {
       const submitBtn = document.getElementById('saveBtn');
       const originalText = submitBtn.textContent;
       
       submitBtn.innerHTML = '<div class="loading-dots"><div></div><div></div><div></div></div> Saving...';
       submitBtn.style.pointerEvents = 'none';
-      
-      // Note: The actual form submission will handle the redirect
-      // This is just for visual feedback during the brief moment before submission
     });
   </script>
 </body>

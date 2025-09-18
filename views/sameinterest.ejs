@@ -131,7 +131,9 @@
           <p><strong>Interest:</strong> <%= user.interests %></p>
           <p><strong>City:</strong> <%= user.city || 'Not specified' %></p>
           <p><strong>About:</strong> <%= user.about || 'No info' %></p>
-          <a href="/chat/<%= user._id %>" class="chat-btn">💬 Send Friend Request</a>
+          <br>
+          <a href="/Message/<%= user._id %>" class="chat-btn">Message</a>
+
         </div>
       <% }) %>
     </div>

@@ -31,6 +31,5 @@ function checkForAuthentication(req, res, next) {
   next();
 }
 
-// Middleware to authorize based on roles
 
 module.exports = { createTokenForUser, checkForAuthentication };

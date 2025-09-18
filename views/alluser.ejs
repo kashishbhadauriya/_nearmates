@@ -118,11 +118,17 @@
       font-weight: 600;
       text-decoration: none;
       transition: all 0.3s ease;
+      cursor: pointer;
     }
 
-    .chat-btn:hover {
+    .chat-btn:hover:not([disabled]) {
       transform: translateY(-2px);
       background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    }
+
+    .chat-btn[disabled] {
+      opacity: 0.7;
+      cursor: default;
     }
 
     .loading {
@@ -149,82 +155,143 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Nearby Users (within 100 km)</h2>
-    <div class="loading">
-      <div class="spinner"></div>
-      Loading users...
-    </div>
-    <div class="user-list"></div>
+ <div class="container">
+  <h2>No user found with your same interest...</h2>
+  <h4>Suggestions:</h4>
+
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Loading users...</p>
   </div>
 
-  <script>
-    const defaultIcon = '/uploads/icon.png'; // fallback user image
+  <div class="user-list"></div>
+</div>
 
-    function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a =
-        Math.sin(dLat/2)**2 +
-        Math.cos(lat1 * Math.PI/180) *
-        Math.cos(lat2 * Math.PI/180) *
-        Math.sin(dLon/2)**2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
+<script>
+const defaultIcon = '/uploads/icon.png';
+
+// Calculate distance
+function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1 * Math.PI/180) *
+    Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Display users
+function showUsers(users, myLat, myLng) {
+  const listContainer = document.querySelector('.user-list');
+  listContainer.innerHTML = '';
+  const loadingDiv = document.querySelector('.loading');
+
+  if (!users || users.length === 0) {
+    loadingDiv.style.display = 'none';
+    listContainer.innerHTML = '<p style="text-align:center;">No users nearby.</p>';
+    return;
+  }
+
+  users.forEach(user => {
+    if (!user.location?.latitude || !user.location?.longitude) return;
+    const dist = getDistanceFromLatLon(myLat, myLng, user.location.latitude, user.location.longitude);
+    if (dist <= 100) {
+      const dp = user.dp || defaultIcon;
+      const card = document.createElement('div');
+      card.className = 'user-card';
+      card.innerHTML = `
+        <img src="${dp}" alt="${user.name}">
+        <div class="user-info">
+          <b>${user.name}</b>
+          <span>🏀 Sport: ${user.interests || 'Not specified'}</span>
+          <span>📍 Distance: ${dist.toFixed(2)} km</span>
+        </div>
+        <button 
+          class="chat-btn"
+          ${user.requestStatus === "Friends" ? 'disabled' : ''}
+          onclick="sendFriendRequest('${user._id}', this)">
+          ${user.requestStatus === "Friends" ? "Friends" : (user.requestStatus || "Add Friend")}
+        </button>
+        <a href="/message/${user._id}" class="chat-btn">Message</a>
+      `;
+      listContainer.appendChild(card);
     }
+  });
 
-    function showUsers(users, myLat, myLng) {
-      const listContainer = document.querySelector('.user-list');
-      listContainer.innerHTML = '';
+  // Hide loading spinner
+  loadingDiv.style.display = 'none';
+}
 
-      users.forEach(user => {
-        if (!user.location?.latitude || !user.location?.longitude) return;
-        const dist = getDistanceFromLatLon(myLat, myLng, user.location.latitude, user.location.longitude);
-        if (dist <= 100) {
-          const dp = user.dp || defaultIcon;
-          const card = document.createElement('div');
-          card.className = 'user-card';
-          card.innerHTML = `
-            <img src="${dp}" alt="${user.name}">
-            <div class="user-info">
-              <b>${user.name}</b>
-              <span>🏀 Sport: ${user.interests || 'Not specified'}</span>
-              <span>📍 Distance: ${dist.toFixed(2)} km</span>
-            </div>
-            <a href="/chat/${user._id}" class="chat-btn">💬 Chat</a>
-          `;
-          listContainer.appendChild(card);
-        }
-      });
+// Send friend request
+function sendFriendRequest(toUserId, btn) {
+  btn.textContent = "Pending";
+  btn.disabled = true;
 
-      const loading = document.querySelector('.loading');
-      if (loading) loading.remove();
-    }
+  fetch(`/friend-request/${toUserId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.message === "Already friends") {
+        btn.textContent = "Friends";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "Pending";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      btn.textContent = "Add Friend";
+      btn.disabled = false;
+      alert("Error sending friend request!");
+    });
+}
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
-        const myLat = position.coords.latitude;
-        const myLng = position.coords.longitude;
+// Get current location and fetch users
+function loadNearbyUsers() {
+  const loadingDiv = document.querySelector('.loading');
+  const listContainer = document.querySelector('.user-list');
+  loadingDiv.style.display = 'flex';
+  listContainer.innerHTML = '';
 
-        // Save current location
-        fetch('/save-location', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: myLat, longitude: myLng })
-        }).catch(err => console.error(err));
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const myLat = position.coords.latitude;
+      const myLng = position.coords.longitude;
 
-        // Fetch other users
-        fetch('/api/locations')
-          .then(res => res.json())
-          .then(users => showUsers(users, myLat, myLng))
-          .catch(err => console.error(err));
-      }, () => {
-        alert("Geolocation not supported or permission denied!");
-      });
-    } else {
-      alert("Geolocation not supported by this browser.");
-    }
-  </script>
+      // Save current location
+      fetch('/save-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitude: myLat, longitude: myLng })
+      }).catch(err => console.error(err));
+
+      // Fetch other users
+      fetch('/api/locations')
+        .then(res => res.json())
+        .then(users => showUsers(users, myLat, myLng))
+        .catch(err => {
+          console.error(err);
+          loadingDiv.style.display = 'none';
+          listContainer.innerHTML = '<p style="text-align:center;">Failed to load users.</p>';
+        });
+    }, () => {
+      alert("Geolocation not supported or permission denied!");
+      loadingDiv.style.display = 'none';
+    });
+  } else {
+    alert("Geolocation not supported by this browser.");
+    loadingDiv.style.display = 'none';
+  }
+}
+
+// Initial load
+loadNearbyUsers();
+</script>
 </body>
 </html>

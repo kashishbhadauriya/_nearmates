@@ -30,7 +30,7 @@ app.use(checkForAuthentication);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    //useUnifiedTopology: true,
   })
   .then(() => {
     console.log("✅ MongoDB Connected");
@@ -62,9 +62,18 @@ const UserSchema = new mongoose.Schema({
     latitude: Number,
     longitude: Number,
   },
+  
+
+  // Friend system
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // incoming
+  sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] // outgoing
+
 });
 
 const User = mongoose.model("User", UserSchema);
+
+
 
 
 
@@ -88,15 +97,24 @@ app.post("/signup", async (req, res) => {
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    await User.create({ name: username, email, password: hashedPassword });
 
-    req.session.user = { username, email };
+    // Store the created user in a variable
+    const newUser = await User.create({ name: username, email, password: hashedPassword });
+
+    // Save session correctly
+    req.session.user = {
+      _id: newUser._id,
+      username: newUser.name,
+      email: newUser.email
+    };
+
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
     res.render("signup", { error: "Something went wrong!" });
   }
 });
+
 
 // Login Post
 app.post("/login", async (req, res) => {
@@ -111,8 +129,12 @@ app.post("/login", async (req, res) => {
     if (!bcrypt.compareSync(password, user.password)) {
       return res.render("login", { error: "Invalid password!" });
     }
-
-    req.session.user = { username: user.name, email: user.email };
+req.session.user = {
+      _id: user._id,
+      username: user.name,
+      email: user.email
+    };
+    
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -230,21 +252,34 @@ app.post("/save-location", async (req, res) => {
 
 app.get("/api/locations", async (req, res) => {
   try {
+    const currentUser = await User.findById(req.session.user._id);
+
     const users = await User.find(
-      { "location.latitude": { $exists: true }, "location.longitude": { $exists: true } },
-      { name: 1, location: 1, interests: 1, dp: 1 }//1 refers to include these fields in the result
+      { "location.latitude": { $exists: true }, "location.longitude": { $exists: true }, _id: { $ne: currentUser._id } },
+      { name: 1, location: 1, interests: 1, dp: 1, friends: 1, friendRequests: 1, sentRequests: 1 }
     );
-    res.json(users);
+
+    const result = users.map(u => {
+      let status = "Add Friend";
+      if (currentUser.friends.includes(u._id)) status = "Friends";
+      else if (u.friendRequests.includes(currentUser._id) || currentUser.sentRequests.includes(u._id)) status = "Pending";
+
+      return {
+        _id: u._id,
+        name: u.name,
+        dp: u.dp,
+        location: u.location,
+        interests: u.interests,
+        requestStatus: status
+      };
+    });
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch locations" });
   }
 });
-
-// server.js / routes.js
-
-
-
 
 
 
@@ -255,32 +290,177 @@ app.get("/sameinterest", async (req, res) => {
       return res.redirect("/");
     }
 
-    const currentUser = await User.findOne({ email: req.session.user.email });
+    // Fetch logged-in user
+    const currentUser = await User.findById(req.session.user._id)
+      .populate("friends sentRequests friendRequests");
 
     if (!currentUser) {
-      return res.redirect("/"); // or show some error page
+      return res.redirect("/"); 
     }
 
-    // Find users with the same interest, excluding current user
+    // Find users with same interest
     const users = await User.find({
       interests: currentUser.interests,
       _id: { $ne: currentUser._id }
     });
 
-    if (!users || users.length === 0) {
-      // No user with same interest, redirect/render alluser
-      const allUsers = await User.find({ _id: { $ne: currentUser._id } });
-      return res.render("alluser", { users: allUsers, message: "No users found with your interest." });
+    if (users.length === 0) {
+      return res.render("alluser", { users: [], currentUser, error: "No users found with the same interest." });
     }
 
-    // Users with same interest found
-    res.render("sameinterest", { users, error: null });
+    // Render page with both users and currentUser
+    res.render("sameinterest", { users, currentUser, error: null });
 
   } catch (err) {
     console.error(err);
-    res.render("sameinterest", { users: [], error: "Failed to load users" });
+    res.render("sameinterest", { users: [], currentUser: null, error: "Failed to load users" });
   }
 });
+
+
+
+
+
+// Send Friend Request
+app.post("/friend-request/:toUserId", async (req, res) => {
+  try {
+    if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
+
+    const user = await User.findById(req.session.user._id);
+    const toUser = await User.findById(req.params.toUserId);
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!toUser) return res.status(404).json({ error: "Recipient not found" });
+
+    if (user.friendRequests.includes(toUser._id)) {
+      return res.json({ message: "Already sent" });
+    }
+
+    user.sentRequests.push(toUser._id);
+    toUser.friendRequests.push(user._id);
+
+    await user.save();
+    await toUser.save();
+
+    res.json({ message: "Request sent", status: "Pending" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
+
+
+
+
+
+
+app.post("/friend-request/accept/:fromUserId", async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
+
+  try {
+    const currentUser = await User.findById(req.session.user._id);
+    const fromUser = await User.findById(req.params.fromUserId);
+    if (!fromUser) return res.status(404).json({ error: "User not found" });
+
+    // Add each other as friends
+    currentUser.friends.push(fromUser._id);
+    fromUser.friends.push(currentUser._id);
+
+    // Remove request
+    currentUser.friendRequests = currentUser.friendRequests.filter(id => id.toString() !== fromUser._id.toString());
+    fromUser.sentRequests = fromUser.sentRequests.filter(id => id.toString() !== currentUser._id.toString());
+
+    await currentUser.save();
+    await fromUser.save();
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
+
+// Reject Friend Request
+app.post("/friend-request/reject/:fromUserId", async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
+
+  try {
+    const currentUser = await User.findById(req.session.user._id);
+
+    // Remove from incoming requests
+    currentUser.friendRequests = currentUser.friendRequests.filter(
+      id => id.toString() !== req.params.fromUserId
+    );
+
+    await currentUser.save();
+
+    res.redirect("/friendRequest"); // ✅ refresh page → request gone
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+
+app.get("/friend-requests", async (req, res) => {
+  if (!req.session.user) return res.redirect("/");
+
+  try {
+    const user = await User.findById(req.session.user._id)
+      .populate("friendRequests", "name email dp");
+
+    res.render("friendRequests", { requests: user.friendRequests });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong");
+  }
+});
+
+
+app.get("/sent-requests", async (req, res) => {
+  if (!req.session.user) return res.redirect("/");
+
+  try {
+    const user = await User.findById(req.session.user._id)
+      .populate("sentRequests", "name email dp");
+
+    res.render("sentRequests", { requests: user.sentRequests });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong");
+  }
+});
+
+
+
+app.get("/friendRequest", async (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+
+  try {
+    // Populate friendRequests with actual user info
+    const user = await User.findById(req.session.user._id)
+      .populate("friendRequests", "name email dp"); // populate only needed fields
+
+    // Populate friends too
+    const friends = await User.find({ _id: { $in: user.friends } })
+      .select("name email dp");
+
+    res.render("friendRequest", {
+      requests: user.friendRequests, // now an array of full user objects
+      friends: friends
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 
 
