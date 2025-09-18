@@ -249,6 +249,7 @@ app.post("/save-location", async (req, res) => {
     res.status(500).json({ error: "Failed to save location" });
   }
 });
+//hi
 
 app.get("/api/locations", async (req, res) => {
   try {
