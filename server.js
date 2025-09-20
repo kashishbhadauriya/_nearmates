@@ -13,7 +13,7 @@ const PORT = 3000;
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use("/uploads", express.static("uploads")); 
+app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -62,20 +62,14 @@ const UserSchema = new mongoose.Schema({
     latitude: Number,
     longitude: Number,
   },
-  
 
-  // Friend system
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // incoming
-  sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] // outgoing
+  friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+  sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] 
 
 });
 
 const User = mongoose.model("User", UserSchema);
-
-
-
-
 
 app.get("/", (req, res) => {
   res.render("login", { error: null });
@@ -91,27 +85,33 @@ app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return res.render("signup", { error: "User already exists!" });
+    // Only allow Gmail addresses
+    if (!email.endsWith("@gmail.com")) {
+      return res.render("signup", { error: "You must use a Gmail account to signup." });
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.render("signup", { error: "User already signed up. Try login." });
+    }
 
-    // Store the created user in a variable
-    const newUser = await User.create({ name: username, email, password: hashedPassword });
+    // Hash password and save new user
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save session correctly
-    req.session.user = {
-      _id: newUser._id,
-      username: newUser.name,
-      email: newUser.email
-    };
+    const newUser = new User({
+      name: username,
+      email,
+      password: hashedPassword
+    });
+
+    await newUser.save();
 
     res.redirect("/dashboard");
+
   } catch (err) {
     console.error(err);
-    res.render("signup", { error: "Something went wrong!" });
+    res.render("signup", { error: "Something went wrong. Try again." });
   }
 });
 
@@ -129,12 +129,12 @@ app.post("/login", async (req, res) => {
     if (!bcrypt.compareSync(password, user.password)) {
       return res.render("login", { error: "Invalid password!" });
     }
-req.session.user = {
+    req.session.user = {
       _id: user._id,
       username: user.name,
       email: user.email
     };
-    
+
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -144,7 +144,7 @@ req.session.user = {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); 
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -296,7 +296,7 @@ app.get("/sameinterest", async (req, res) => {
       .populate("friends sentRequests friendRequests");
 
     if (!currentUser) {
-      return res.redirect("/"); 
+      return res.redirect("/");
     }
 
     // Find users with same interest
