@@ -81,39 +81,36 @@ app.get("/signup", (req, res) => {
 });
 
 // Signup Post
+
 app.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
-    // Only allow Gmail addresses
-    if (!email.endsWith("@gmail.com")) {
-      return res.render("signup", { error: "You must use a Gmail account to signup." });
-    }
-
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.render("signup", { error: "User already signed up. Try login." });
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.render("signup", { error: "Email already in use!" });
     }
 
-    // Hash password and save new user
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Check password length
+    if (password.length < 3) {
+      return res.render("signup", { error: "Password must be at least 3 characters long!" });
+    }
 
-    const newUser = new User({
-      name: username,
-      email,
-      password: hashedPassword
-    });
+    // Hash password and create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ name, email, password: hashedPassword });
 
     await newUser.save();
 
-    res.redirect("/dashboard");
-
+    res.redirect("/dashboard"); // redirect after successful signup
   } catch (err) {
     console.error(err);
-    res.render("signup", { error: "Something went wrong. Try again." });
+    res.render("signup", { error: "Something went wrong!" });
   }
 });
+
+
 
 
 // Login Post
@@ -142,6 +139,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+// Multer setup for file uploads
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -166,7 +166,7 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-// Update Profile with DP upload
+// Update Profile with DP upload 
 app.post("/update-profile", upload.single("dp"), async (req, res) => {
   if (!req.session.user) return res.redirect("/");
 
@@ -190,8 +190,10 @@ app.post("/update-profile", upload.single("dp"), async (req, res) => {
   }
 });
 
-// ================== OTHER ROUTES ==================
 
+
+
+//get for dashboard  (after login)  - renders the dashboard page with user info ...
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
     return res.redirect("/");
@@ -199,16 +201,24 @@ app.get("/dashboard", (req, res) => {
   res.render("dashboard", { user: req.session.user });
 });
 
+
+
+
+//get for map
 app.get("/map", (req, res) => {
   if (!req.session.user) return res.redirect("/");
   res.render("map", { user: req.session.user });
 });
 
+
+//get for learn about safety
 app.get("/learnaboutsafety", (req, res) => {
   if (!req.session.user) return res.redirect("/");
   res.render("aboutSafety", { user: req.session.user });
 });
 
+
+//get for mapdetails
 app.get("/mapdetails", async (req, res) => {
   try {
     const users = await User.find(
@@ -231,6 +241,8 @@ app.get("/about", (req, res) => {
   res.render("about", { user: req.session.user });
 });
 
+
+//
 app.post("/save-location", async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
 
@@ -249,14 +261,19 @@ app.post("/save-location", async (req, res) => {
     res.status(500).json({ error: "Failed to save location" });
   }
 });
-//hi
 
+
+
+
+//fetch locations of all users except current username
 app.get("/api/locations", async (req, res) => {
   try {
     const currentUser = await User.findById(req.session.user._id);
 
     const users = await User.find(
-      { "location.latitude": { $exists: true }, "location.longitude": { $exists: true }, _id: { $ne: currentUser._id } },
+      { "location.latitude": { $exists: true }, 
+      "location.longitude": { $exists: true },
+       _id: { $ne: currentUser._id } },//$ne-not equal operator in MongoDB.
       { name: 1, location: 1, interests: 1, dp: 1, friends: 1, friendRequests: 1, sentRequests: 1 }
     );
 
@@ -284,31 +301,26 @@ app.get("/api/locations", async (req, res) => {
 
 
 
-
+//get for same interests
 app.get("/sameinterest", async (req, res) => {
   try {
     if (!req.session.user) {
       return res.redirect("/");
     }
-
-    // Fetch logged-in user
-    const currentUser = await User.findById(req.session.user._id)
-      .populate("friends sentRequests friendRequests");
+    const currentUser = await User.findById(req.session.user._id)//Looks up the current logged-in user in MongoDB by their _id
+     .populate("friends sentRequests friendRequests");//populate is a Mongoose helper that automatically replaces those ObjectIds with the actual documents they refer to.
 
     if (!currentUser) {
       return res.redirect("/");
     }
-
-    // Find users with same interest
     const users = await User.find({
-      interests: currentUser.interests,
+      interests:{$in: currentUser.interests },
       _id: { $ne: currentUser._id }
     });
 
     if (users.length === 0) {
       return res.render("alluser", { users: [], currentUser, error: "No users found with the same interest." });
     }
-
     // Render page with both users and currentUser
     res.render("sameinterest", { users, currentUser, error: null });
 
@@ -376,6 +388,7 @@ app.post("/friend-request/accept/:fromUserId", async (req, res) => {
 
     await currentUser.save();
     await fromUser.save();
+    res.redirect("/friendRequest"); // ✅ refresh page → request gone
 
   } catch (err) {
     console.error(err);
@@ -462,6 +475,10 @@ app.get("/friendRequest", async (req, res) => {
   }
 });
 
+
+app.get("/checkalluser", (req, res) => {
+  res.render("checkalluser"); 
+});
 
 
 
