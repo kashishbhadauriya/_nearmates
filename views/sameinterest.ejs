@@ -125,17 +125,17 @@
   <% } else { %>
     <div class="users-list">
       <% users.forEach(function(user) { %>
-        <div class="user-card">
-          <img src="<%= user.dp || '/uploads/icon.png' %>" alt="<%= user.name %>">
-          <h2><%= user.name %></h2>
-          <p><strong>Interest:</strong> <%= user.interests %></p>
-          <p><strong>City:</strong> <%= user.city || 'Not specified' %></p>
-          <p><strong>About:</strong> <%= user.about || 'No info' %></p>
-          <br>
-          <a href="/Message/<%= user._id %>" class="chat-btn">Message</a>
+  <div class="user-card">
+    <img src="<%= user.dp || '/uploads/icon.png' %>" alt="<%= user.name %>">
+    <h2><%= user.name %></h2>
+    <p><strong>Interest:</strong> <%= user.interests %></p>
+    <p><strong>City:</strong> <%= user.city || 'Not specified' %></p>
+    <p><strong>About:</strong> <%= user.about || 'No info' %></p>
+    <br>
+    <a href="/Message/<%= user._id %>" class="chat-btn">Message</a>
+  </div>
+<% }) %>
 
-        </div>
-      <% }) %>
     </div>
   <% } %>
 </body>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nearby Users</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="90" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+      animation: float 20s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
+    }
+
+    .container {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.2);
+      width: 95%;
+      max-width: 800px;
+      position: relative;
+      z-index: 2;
+      color: white;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 2.5em;
+      margin-bottom: 25px;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .user-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      padding: 15px 20px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .user-card img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #667eea;
+      box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+    }
+
+    .user-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .user-info b {
+      font-size: 16px;
+      color: #f0f0f0;
+    }
+
+    .user-info span {
+      font-size: 13px;
+      color: #ddd;
+    }
+
+    .chat-btn {
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 25px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .chat-btn:hover:not([disabled]) {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    }
+
+    .chat-btn[disabled] {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+ <div class="container">
+  <h2>All users of NearMates</h2>
+  <h4>Suggestions:</h4>
+
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Loading users...</p>
+  </div>
+
+  <div class="user-list"></div>
+</div>
+
+<script>
+const defaultIcon = '/uploads/icon.png';
+
+// Calculate distance
+function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(lat1 * Math.PI/180) *
+    Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLon/2)**2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Display users
+function showUsers(users, myLat, myLng) {
+  const listContainer = document.querySelector('.user-list');
+  listContainer.innerHTML = '';
+  const loadingDiv = document.querySelector('.loading');
+
+  if (!users || users.length === 0) {
+    loadingDiv.style.display = 'none';
+    listContainer.innerHTML = '<p style="text-align:center;">No users nearby.</p>';
+    return;
+  }
+
+  users.forEach(user => {
+    if (!user.location?.latitude || !user.location?.longitude) return;
+    const dist = getDistanceFromLatLon(myLat, myLng, user.location.latitude, user.location.longitude);
+    if (dist <= 100) {
+      const dp = user.dp || defaultIcon;
+      const card = document.createElement('div');
+      card.className = 'user-card';
+      card.innerHTML = `
+        <img src="${dp}" alt="${user.name}">
+        <div class="user-info">
+          <b>${user.name}</b>
+          <span>🏀 Sport: ${user.interests || 'Not specified'}</span>
+          <span>📍 Distance: ${dist.toFixed(2)} km</span>
+        </div>
+        <button 
+          class="chat-btn"
+          ${user.requestStatus === "Friends" ? 'disabled' : ''}
+          onclick="sendFriendRequest('${user._id}', this)">
+          ${user.requestStatus === "Friends" ? "Friends" : (user.requestStatus || "Add Friend")}
+        </button>
+        <a href="/message/${user._id}" class="chat-btn">Message</a>
+      `;
+      listContainer.appendChild(card);
+    }
+  });
+
+  // Hide loading spinner
+  loadingDiv.style.display = 'none';
+}
+
+// Send friend request
+function sendFriendRequest(toUserId, btn) {
+  btn.textContent = "Pending";
+  btn.disabled = true;
+
+  fetch(`/friend-request/${toUserId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.message === "Already friends") {
+        btn.textContent = "Friends";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "Pending";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      btn.textContent = "Add Friend";
+      btn.disabled = false;
+      alert("Error sending friend request!");
+    });
+}
+
+// Get current location and fetch users
+function loadNearbyUsers() {
+  const loadingDiv = document.querySelector('.loading');
+  const listContainer = document.querySelector('.user-list');
+  loadingDiv.style.display = 'flex';
+  listContainer.innerHTML = '';
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const myLat = position.coords.latitude;
+      const myLng = position.coords.longitude;
+
+      // Save current location
+      fetch('/save-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitude: myLat, longitude: myLng })
+      }).catch(err => console.error(err));
+
+      // Fetch other users
+      fetch('/api/locations')
+        .then(res => res.json())
+        .then(users => showUsers(users, myLat, myLng))
+        .catch(err => {
+          console.error(err);
+          loadingDiv.style.display = 'none';
+          listContainer.innerHTML = '<p style="text-align:center;">Failed to load users.</p>';
+        });
+    }, () => {
+      alert("Geolocation not supported or permission denied!");
+      loadingDiv.style.display = 'none';
+    });
+  } else {
+    alert("Geolocation not supported by this browser.");
+    loadingDiv.style.display = 'none';
+  }
+}
+
+// Initial load
+loadNearbyUsers();
+</script>
+</body>
+</html>

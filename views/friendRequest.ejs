@@ -688,9 +688,12 @@
                   <% if(user.dp) { %>
                     <img src="<%= user.dp %>" alt="<%= user.name %>'s profile" class="user-avatar">
                   <% } else { %>
-                    <div class="avatar-placeholder">
-                      <%= user.name.charAt(0).toUpperCase() %>
-                    </div>
+               <div class="avatar-placeholder">
+  <%= user && user.name ? user.name.charAt(0).toUpperCase() : "?" %>
+</div>
+
+
+
                   <% } %>
                   <div class="user-details">
                     <h3><%= user.name %></h3>
@@ -748,9 +751,13 @@
                   <% if(friend.dp) { %>
                     <img src="<%= friend.dp %>" alt="<%= friend.name %>'s profile" class="user-avatar">
                   <% } else { %>
-                    <div class="avatar-placeholder">
-                      <%= friend.name.charAt(0).toUpperCase() %>
-                    </div>
+                  
+           <div class="avatar-placeholder">
+  <%= friend && friend.name ? friend.name.charAt(0).toUpperCase() : "?" %>
+</div>
+
+
+                  
                   <% } %>
                   <div class="user-details">
                     <h3><%= friend.name %></h3>
