@@ -159,10 +159,7 @@
       animation: rotate 10s linear infinite;
     }
 
-    @keyframes rotate {
-      to { transform: rotate(360deg); }
-    }
-
+  
     #dpPreview {
       width: 172px;
       height: 172px;
@@ -507,14 +504,56 @@
       background: linear-gradient(135deg, #ff0096, #7f00ff);
       border-radius: 4px;
     }
+    .back-button-container {
+  position: fixed;  /* so it stays on top */
+  top: 20px;
+  left: 20px;
+  z-index: 10;      /* higher than orbs and card */
+}
+
+.btn-chat {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff0096 0%, #7f00ff 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 6px 20px rgba(255, 0, 150, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 0, 150, 0.6);
+}
+
   </style>
 </head>
 <body>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
+ 
   
   <div class="container">
+      <div class="back-button-container">
+    <button type="button" class="btn btn-chat" onclick="window.history.back()">
+      back
+    </button>
+
+  </div>
+    
+
+
+
+
+
+
+
     <div class="profile-card">
+
+      
       <div class="profile-header">
         <div class="avatar-section">
           <div class="avatar-ring">
@@ -541,11 +580,12 @@
               <input type="date" name="dob" value="<%= user.dob || '' %>" class="form-input">
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Occupation</label>
-              <input type="text" name="occupation" value="<%= user.occupation || '' %>" 
-                     placeholder="What do you do?" class="form-input">
-            </div>
+           <div class="form-group">
+  <label class="form-label">Occupation</label>
+  <input type="text" name="occupation" value="<%= user.occupation || '' %>" 
+         placeholder="What do you do?" class="form-input">
+</div>
+
 
             <div class="form-group">
               <label class="form-label">State</label>

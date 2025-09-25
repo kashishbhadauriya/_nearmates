@@ -473,11 +473,42 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-gradient);
 }
+.back-button-container {
+  position: fixed;  /* so it stays on top */
+  top: 20px;
+  left: 20px;
+  z-index: 10;      /* higher than orbs and card */
+}
+
+.btn-chat {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff0096 0%, #7f00ff 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 6px 20px rgba(255, 0, 150, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 0, 150, 0.6);
+}
+
+
 </style>
 </head>
 
 <body>
   <div class="container">
+     <div class="back-button-container">
+    <button type="button" class="btn btn-chat" onclick="window.history.back()">
+      back
+    </button>
+  </div>
     <!-- Header Section -->
     <header class="header">
       <h1 class="main-title">NearMates</h1>

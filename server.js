@@ -196,7 +196,7 @@ app.post("/update-profile", upload.single("dp"), async (req, res) => {
 //get for dashboard  (after login)  - renders the dashboard page with user info ...
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
-    return res.redirect("/");
+    return res.redirect("/login"); // session destroy hone par wapas login
   }
   res.render("dashboard", { user: req.session.user });
 });
@@ -482,13 +482,10 @@ app.get("/checkalluser", (req, res) => {
 
 
 
-
-
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
-
 
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)

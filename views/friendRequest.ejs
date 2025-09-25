@@ -633,11 +633,14 @@
     ::-webkit-scrollbar-thumb:hover {
       background: var(--secondary-gradient);
     }
+    
   </style>
 </head>
 <body>
+  
   <!-- Navbar -->
   <nav class="navbar">
+
     <div class="logo">
       <i class="fas fa-heart"></i>
       NearMates
@@ -647,8 +650,19 @@
       <li><a href="/friendRequest">Friend Requests</a></li>
     </ul>
   </nav>
+   <div class="main-container">
+      <div class="back-button-container">
+    <button type="button" class="btn btn-chat" onclick="window.history.back()">
+      back
+    </button>
+  </div>
 
-  <div class="main-container">
+
+
+
+
+
+ 
     <!-- Stats Overview -->
     <div class="stats-container">
       <div class="stat-card">
@@ -730,6 +744,7 @@
         <h2 class="section-title">Your Friends</h2>
         <p class="section-subtitle">Your connected network</p>
       </div>
+      <button ></button>
 
       <div class="cards-container">
         <% if (friends.length === 0) { %>
