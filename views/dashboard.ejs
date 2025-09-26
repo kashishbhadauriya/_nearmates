@@ -107,6 +107,17 @@
         transition: all 0.3s ease;
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
       }
+      .dark-toggle {
+  font-size: 12px;      
+  padding: 1px 4px;   
+  border-radius: 4px;   
+}
+
+.dark-toggle i {
+  font-size: 12px;    
+}
+
+    
 
       .nav-btn:hover {
         transform: translateY(-2px);
@@ -667,7 +678,7 @@ body.dark-mode .footer-link:hover {
           <li><a href="#contact">Contact</a></li>
           <li><a href="/profile" class="nav-btn">Profile</a></li>
          <li><a href="/" class="nav-btn">Logout</a></li>
-                 <li><button id="darkToggle" class="dark-toggle"><i class="fas fa-moon"></i> Dark Mode</button></li>
+                 <li><button id="darkToggle" class="dark-toggle"><i class="fas fa-moon" width="30px"></i></button></li>
 
 
         </ul>
@@ -967,9 +978,9 @@ body.dark-mode .footer-link:hover {
     document.body.classList.toggle("dark-mode");
 
     if (document.body.classList.contains("dark-mode")) {
-      toggleBtn.textContent = "☀️ Light Mode";
+      toggleBtn.textContent = "☀️";
     } else {
-      toggleBtn.textContent = "🌙 Dark Mode";
+      toggleBtn.textContent = "🌙";
     }
   });
 </script>
