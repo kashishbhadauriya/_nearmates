@@ -108,16 +108,14 @@
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
       }
       .dark-toggle {
-  font-size: 12px;      
-  padding: 1px 4px;   
-  border-radius: 4px;   
-}
+        font-size: 12px;
+        padding: 1px 4px;
+        border-radius: 4px;
+      }
 
-.dark-toggle i {
-  font-size: 12px;    
-}
-
-    
+      .dark-toggle i {
+        font-size: 12px;
+      }
 
       .nav-btn:hover {
         transform: translateY(-2px);
@@ -600,70 +598,67 @@
         transform: translateY(0);
       }
 
-          /* Dark Mode */
-    body.dark-mode {
-      background: #0c0909;
-      color:  #0c0707;
-    }
-  
-    body.dark-mode .navbar {
-      background: rgba(30, 30, 30, 0.95);
-    }
-    body.dark-mode .feature-card,
-    body.dark-mode .features-list,
-    body.dark-mode .feature-item {
-      background: #1e1e1e;
-      color: #faf8f8;
-    }
-    body.dark-mode .nav-links a,
-    body.dark-mode .nav-btn {
-      color:  #fffcfc;
-    }
-    body.dark-mode .nav-links a:hover,
-    body.dark-mode .nav-btn:hover {
-      color: #667eea;
-    }
-    body.dark-mode .feature-title,
-    body.dark-mode .feature-item-content h3 {
-      color: #fffcfc;
-    } 
-    body.dark-mode .feature-description,
-    body.dark-mode.feature-item-content p {
-      color: #fffcfc;
-    }
-    body.dark-mode .feature-item-content p {
-      color: #fffcfc;
-    }
-    body .dark-mode .main-content{
-      background: #121212;
-      color: #0c0808;
-    }
-body.dark-mode footer {
-  background: #222;
-  color: #f1f1f1;
-}
+      /* Dark Mode */
+      body.dark-mode {
+        background: #0c0909;
+        color: #0c0707;
+      }
 
-body.dark-mode .footer-link {
-  color: #f1f1f1;
-}
+      body.dark-mode .navbar {
+        background: rgba(30, 30, 30, 0.95);
+      }
+      body.dark-mode .feature-card,
+      body.dark-mode .features-list,
+      body.dark-mode .feature-item {
+        background: #1e1e1e;
+        color: #faf8f8;
+      }
+      body.dark-mode .nav-links a,
+      body.dark-mode .nav-btn {
+        color: #fffcfc;
+      }
+      body.dark-mode .nav-links a:hover,
+      body.dark-mode .nav-btn:hover {
+        color: #667eea;
+      }
+      body.dark-mode .feature-title,
+      body.dark-mode .feature-item-content h3 {
+        color: #fffcfc;
+      }
+      body.dark-mode .feature-description,
+      body.dark-mode.feature-item-content p {
+        color: #fffcfc;
+      }
+      body.dark-mode .feature-item-content p {
+        color: #fffcfc;
+      }
+      body .dark-mode .main-content {
+        background: #121212;
+        color: #0c0808;
+      }
+      body.dark-mode footer {
+        background: #222;
+        color: #f1f1f1;
+      }
 
-body.dark-mode .footer-link:hover {
-  color: #e7e6e4;
-}
+      body.dark-mode .footer-link {
+        color: #f1f1f1;
+      }
 
+      body.dark-mode .footer-link:hover {
+        color: #e7e6e4;
+      }
 
-
-
-    .dark-toggle {
-      cursor: pointer;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border: none;
-      color: rgb(221, 211, 211);
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 14px;
-      margin-left: 15px;
-    }
+      .dark-toggle {
+        cursor: pointer;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        color: rgb(221, 211, 211);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-left: 15px;
+      }
     </style>
   </head>
   <body>
@@ -677,15 +672,16 @@ body.dark-mode .footer-link:hover {
           <li><a href="/about">About</a></li>
           <li><a href="#contact">Contact</a></li>
           <li><a href="/profile" class="nav-btn">Profile</a></li>
-         <li><a href="/" class="nav-btn">Logout</a></li>
-                 <li><button id="darkToggle" class="dark-toggle"><i class="fas fa-moon" width="30px"></i></button></li>
-
-
+          <li><a href="/" class="nav-btn">Logout</a></li>
+          <li>
+            <button id="darkToggle" class="dark-toggle">
+              <i class="fas fa-moon" width="30px"></i>
+            </button>
+          </li>
         </ul>
       </div>
     </nav>
 
-  
     <section class="hero" id="home">
       <div class="hero-content">
         <h1>Welcome to NearMates</h1>
@@ -840,7 +836,6 @@ body.dark-mode .footer-link:hover {
     </div>
 
     <!-- Stats Section -->
- 
 
     <!-- Footer -->
     <footer id="contact">
@@ -871,9 +866,7 @@ body.dark-mode .footer-link:hover {
         </div>
 
         <div class="footer-bottom">
-          <p>
-            &copy; 2025 NearMates. All rights reserved..
-          </p>
+          <p>&copy; 2025 NearMates. All rights reserved..</p>
         </div>
       </div>
     </footer>
@@ -969,20 +962,19 @@ body.dark-mode .footer-link:hover {
           this.style.transform = "translateY(-15px) scale(1)";
         });
       });
-
     </script>
     <script>
-  const toggleBtn = document.getElementById("darkToggle");
+      const toggleBtn = document.getElementById("darkToggle");
 
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
+      toggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
 
-    if (document.body.classList.contains("dark-mode")) {
-      toggleBtn.textContent = "☀️";
-    } else {
-      toggleBtn.textContent = "🌙";
-    }
-  });
-</script>
+        if (document.body.classList.contains("dark-mode")) {
+          toggleBtn.textContent = "☀️";
+        } else {
+          toggleBtn.textContent = "🌙";
+        }
+      });
+    </script>
   </body>
 </html>

@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const session = require("express-session");
+const validator = require("validator"); 
 const bodyParser = require("body-parser");
 const { createTokenForUser, checkForAuthentication } = require("./authMiddleware");
 
@@ -30,7 +31,7 @@ app.use(checkForAuthentication);
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    //useUnifiedTopology: true,
+    useUnifiedTopology: true,
   })
   .then(() => {
     console.log("✅ MongoDB Connected");
@@ -58,10 +59,13 @@ const UserSchema = new mongoose.Schema({
   favSports: String,
   about: String,
   dp: String,
+  timestamp: { type: Date, default: Date.now },
   location: {
     latitude: Number,
     longitude: Number,
   },
+  
+
 
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
@@ -83,33 +87,38 @@ app.get("/signup", (req, res) => {
 // Signup Post
 
 app.post("/signup", async (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
-    // Check if user already exists
-    const user = await User.findOne({ email });
-    if (user) {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.render("signup", { error: "All fields are required!" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.render("signup", { error: "Invalid email format!" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.render("signup", { error: "Email already in use!" });
     }
 
-    // Check password length
     if (password.length < 3) {
       return res.render("signup", { error: "Password must be at least 3 characters long!" });
     }
 
-    // Hash password and create new user
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ name, email, password: hashedPassword });
-
     await newUser.save();
 
-    res.redirect("/dashboard"); // redirect after successful signup
+    req.session.user = newUser;
+
+    return res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
-    res.render("signup", { error: "Something went wrong!" });
+    return res.render("signup", { error: "Something went wrong!" });
   }
 });
-
 
 
 
@@ -193,7 +202,7 @@ app.post("/update-profile", upload.single("dp"), async (req, res) => {
 
 
 
-//get for dashboard  (after login)  - renders the dashboard page with user info ...
+//get for dashboard  (after login/signup)  - renders the dashboard page with user info ...
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
     return res.redirect("/login"); // session destroy hone par wapas login
@@ -330,6 +339,23 @@ app.get("/sameinterest", async (req, res) => {
   }
 });
 
+app.get("/alluser", async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/");
+    }
+    const currentUser = await User.findById(req.session.user._id)
+      .populate("friends sentRequests friendRequests");
+    if (!currentUser) {
+      return res.redirect("/");
+    }
+    const users = await User.find({ _id: { $ne: currentUser._id } });
+    res.render("alluser", { users, currentUser, error: null });
+  } catch (err) {
+    console.error(err);
+    res.render("alluser", { users: [], currentUser: null, error: "Failed to load users" });
+  }
+});
 
 
 
