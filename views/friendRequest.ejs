@@ -502,10 +502,29 @@
     ::-webkit-scrollbar-thumb:hover {
       background: var(--text-secondary);
     }
+    .notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background: #10B981; /* green */
+  border-radius: 50%;
+  box-shadow: 0 0 6px #10B981;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
   </style>
 </head>
 <body>
-  
+
+
   <!-- Navbar -->
   <nav class="navbar">
     <div class="navbar-container">
@@ -513,11 +532,19 @@
         <i class="fas fa-heart"></i>
         NearMates
       </div>
-      <ul class="nav-links">
-        <li><a href="/dashboard">Home</a></li>
-        <li><a href="/friendRequest">Friend Requests</a></li>
-      </ul>
+<ul class="nav-links">
+  <li><a href="/dashboard">Home</a></li>
+  <li style="position: relative;">
+    <a href="/friendRequest">
+      Friend Requests
+      <% if (requests.length > 0) { %>
+        <span class="notification-dot"></span>
+      <% } %>
+    </a>
+  </li>
+</ul>
     </div>
+     
   </nav>
 
   <div class="main-container">

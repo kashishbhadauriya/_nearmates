@@ -204,11 +204,16 @@ app.post("/update-profile", upload.single("dp"), async (req, res) => {
 
 //get for dashboard  (after login/signup)  - renders the dashboard page with user info ...
 app.get("/dashboard", (req, res) => {
-  if (!req.session.user) {
-    return res.redirect("/login"); // session destroy hone par wapas login
-  }
-  res.render("dashboard", { user: req.session.user });
+  if (!req.session.user) return res.redirect("/login");
+
+  const pendingRequestsCount = req.session.pendingCount || 0;
+
+  res.render("dashboard", {
+    user: req.session.user,
+    pendingRequestsCount
+  });
 });
+
 
 
 
@@ -358,6 +363,10 @@ app.get("/alluser", async (req, res) => {
 });
 
 
+app.get("/userGuide", (req, res) => {
+  res.render("userGuide");
+});
+
 
 
 // Send Friend Request
@@ -478,7 +487,6 @@ app.get("/sent-requests", async (req, res) => {
 });
 
 
-
 app.get("/friendRequest", async (req, res) => {
   if (!req.session.user) return res.redirect("/login");
 
@@ -491,8 +499,11 @@ app.get("/friendRequest", async (req, res) => {
     const friends = await User.find({ _id: { $in: user.friends } })
       .select("name email dp");
 
+    // ✅ Store the count in session for dashboard use
+    req.session.pendingCount = user.friendRequests.length;
+
     res.render("friendRequest", {
-      requests: user.friendRequests, // now an array of full user objects
+      requests: user.friendRequests,
       friends: friends
     });
   } catch (err) {

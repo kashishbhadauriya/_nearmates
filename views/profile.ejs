@@ -590,9 +590,8 @@
       <div class="profile-header">
         <div class="avatar-section">
           <div class="avatar-ring">
-            <img id="dpPreview" 
-                 src="<%= user.dp || '/default-dp.png' %>" 
-                 alt="">
+           <img id="dpPreview" src="<%= (user && user.dp) ? user.dp : '/default-dp.png' %>" alt="">
+
           </div>
           <div class="upload-overlay">
             📸
