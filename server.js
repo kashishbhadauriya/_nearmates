@@ -163,6 +163,7 @@ const upload = multer({ storage });
 
 
 // Profile 
+
 app.get("/profile", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
 
@@ -174,6 +175,7 @@ app.get("/profile", async (req, res) => {
     res.redirect("/dashboard");
   }
 });
+
 
 // Update Profile with DP upload 
 app.post("/update-profile", upload.single("dp"), async (req, res) => {
