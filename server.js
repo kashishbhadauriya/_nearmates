@@ -89,6 +89,9 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+    imageUrl:{
+    type: String,
+    } ,
   timestamp: {
     type: Date,
     default: Date.now
@@ -182,7 +185,9 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
-const upload = multer({ storage });
+
+
+const upload = multer({ storage: storage });
 
 // Profile 
 
@@ -332,32 +337,36 @@ app.get("/api/locations", async (req, res) => {
 
 //get for same interests
 app.get("/sameinterest", async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/");
-    }
-    const currentUser = await User.findById(req.session.user._id)//Looks up the current logged-in user in MongoDB by their _id
-     .populate("friends sentRequests friendRequests");//populate is a Mongoose helper that automatically replaces those ObjectIds with the actual documents they refer to.
+  if (!req.session.user) return res.redirect("/login");
 
-    if (!currentUser) {
-      return res.redirect("/");
-    }
+  try {
+    const currentUser = await User.findById(req.session.user._id)
+      .populate("friends", "_id")
+      .populate("sentRequests", "_id")
+      .populate("friendRequests", "_id");
+
     const users = await User.find({
-      interests:{$in: currentUser.interests },
-      _id: { $ne: currentUser._id }
+      _id: { $ne: currentUser._id },
+      interests: { $in: currentUser.interests }
     });
 
-    if (users.length === 0) {
-      return res.render("alluser", { users: [], currentUser, error: "No users found with the same interest." });
-    }
-    // Render page with both users and currentUser
-    res.render("sameinterest", { users, currentUser, error: null });
+    // Attach status to each user
+    const updatedUsers = users.map(u => {
+      let status = "none";
+      if (currentUser.friends.some(f => f._id.equals(u._id))) status = "friends";
+      else if (currentUser.sentRequests.some(r => r._id.equals(u._id))) status = "sent";
+      else if (currentUser.friendRequests.some(r => r._id.equals(u._id))) status = "pending";
+      return { ...u.toObject(), status };
+    });
+
+    res.render("sameinterest", { users: updatedUsers });
 
   } catch (err) {
     console.error(err);
-    res.render("sameinterest", { users: [], currentUser: null, error: "Failed to load users" });
+    res.status(500).send("Server Error");
   }
 });
+
 
 app.get("/alluser", async (req, res) => {
   try {
