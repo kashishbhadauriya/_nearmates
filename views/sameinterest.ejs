@@ -189,7 +189,9 @@
     <% } else if (users && users.length === 0) { %>
       <div class="no-users">
         <div class="no-users-icon">👥</div>
-        <strong>No users found with the same interest.</strong>
+         <script>
+    window.location.href = "/alluser";
+  </script>
       </div>
     <% } else if (users && users.length > 0) { %>
       <div class="users-list">

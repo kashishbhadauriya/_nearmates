@@ -27,12 +27,9 @@
       --border: #E5E7EB;
       --border-light: #F3F4F6;
       
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
       
-      --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --radius-xl: 20px;
@@ -40,11 +37,7 @@
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', sans-serif;
@@ -54,7 +47,6 @@
       color: var(--text-primary);
     }
 
-    /* Back Button */
     .back-button-container {
       position: fixed;
       top: 20px;
@@ -80,10 +72,8 @@
     .btn-back:hover {
       background: var(--bg-tertiary);
       color: var(--text-primary);
-      border-color: var(--text-tertiary);
     }
 
-    /* Container */
     .container {
       max-width: 900px;
       margin: 60px auto 0;
@@ -94,35 +84,59 @@
       border: 1px solid var(--border);
     }
 
-    /* Header */
-    .page-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
     h2 {
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
       font-size: 2rem;
       color: var(--text-primary);
       margin-bottom: 8px;
-    }
-
-    h4 {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 1.25rem;
-      color: var(--text-primary);
-      margin-bottom: 24px;
-      text-align: left;
+      text-align: center;
     }
 
     .header-subtitle {
+      text-align: center;
       font-size: 1rem;
       color: var(--text-secondary);
+      margin-bottom: 30px;
     }
 
-    /* Loading State */
+    /* Distance Filter */
+    .distance-filter {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .distance-filter label {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    #distanceRange {
+      width: 200px;
+      accent-color: var(--primary);
+    }
+
+    .refresh-btn {
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .refresh-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
     .loading {
       display: flex;
       align-items: center;
@@ -147,14 +161,12 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* User List */
     .user-list {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* User Card */
     .user-card {
       background: var(--bg-secondary);
       padding: 20px;
@@ -203,14 +215,11 @@
       gap: 6px;
     }
 
-    /* Action Buttons Container */
     .action-buttons {
       display: flex;
       gap: 10px;
-      flex-shrink: 0;
     }
 
-    /* Buttons */
     .chat-btn, .add-friend-btn {
       padding: 10px 20px;
       border-radius: var(--radius-md);
@@ -255,7 +264,6 @@
       opacity: 0.7;
     }
 
-    /* Empty State */
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -274,7 +282,6 @@
       font-size: 2rem;
     }
 
-    /* Distance Badge */
     .distance-badge {
       display: inline-flex;
       align-items: center;
@@ -287,85 +294,9 @@
       font-weight: 600;
     }
 
-    /* Status Badge */
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .status-friends {
-      background: #D1FAE5;
-      color: #065F46;
-    }
-
-    .status-pending {
-      background: #FEF3C7;
-      color: #92400E;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container {
-        padding: 24px;
-        margin-top: 80px;
-      }
-
-      .back-button-container {
-        position: static;
-        margin-bottom: 20px;
-      }
-
-      h2 {
-        font-size: 1.75rem;
-      }
-
-      .user-card {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-      }
-
-      .user-info {
-        align-items: center;
-      }
-
-      .user-info span {
-        justify-content: center;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .chat-btn, .add-friend-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 20px 16px;
-      }
-
-      .container {
-        padding: 20px;
-      }
-    }
-
-    /* Animations */
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .user-card {
@@ -375,18 +306,20 @@
 </head>
 <body>
   <div class="back-button-container">
-    <button type="button" class="btn-back" onclick="window.history.back()">
-      ← Back
-    </button>
+    <button type="button" class="btn-back" onclick="window.history.back()">← Back</button>
   </div>
 
   <div class="container">
-    <div class="page-header">
-      <h2>No user found with your same interest...</h2>
-      <p class="header-subtitle">Discover nearby users who share similar interests</p>
-    </div>
+    <h2>Nearby Users</h2>
+    <p class="header-subtitle">Discover users around you with similar interests</p>
 
-    <h4>Suggestions:</h4>
+    <!-- Distance Filter -->
+    <div class="distance-filter">
+      <label for="distanceRange">Show users within:</label>
+      <input type="range" id="distanceRange" min="1" max="1000" value="10" oninput="updateDistanceLabel(this.value)">
+      <span id="distanceLabel">10 km</span>
+      <button class="refresh-btn" onclick="loadNearbyUsers()">🔄 Refresh</button>
+    </div>
 
     <div class="loading">
       <div class="spinner"></div>
@@ -398,42 +331,45 @@
 
   <script>
     const defaultIcon = '/uploads/icon.png';
+    let selectedDistance = 10; // Default distance
 
-    // Calculate distance
+    function updateDistanceLabel(value) {
+      selectedDistance = parseInt(value);
+      document.getElementById("distanceLabel").textContent = `${selectedDistance} km`;
+    }
+
     function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a =
-        Math.sin(dLat/2)**2 +
-        Math.cos(lat1 * Math.PI/180) *
-        Math.cos(lat2 * Math.PI/180) *
-        Math.sin(dLon/2)**2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const a = Math.sin(dLat/2)**2 +
+                Math.cos(lat1 * Math.PI/180) *
+                Math.cos(lat2 * Math.PI/180) *
+                Math.sin(dLon/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
 
-    // Display users
     function showUsers(users, myLat, myLng) {
       const listContainer = document.querySelector('.user-list');
-      listContainer.innerHTML = '';
       const loadingDiv = document.querySelector('.loading');
+      listContainer.innerHTML = '';
+      loadingDiv.style.display = 'none';
 
       if (!users || users.length === 0) {
-        loadingDiv.style.display = 'none';
         listContainer.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">👥</div>
             <p>No users nearby.</p>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
       users.forEach(user => {
         if (!user.location?.latitude || !user.location?.longitude) return;
         const dist = getDistanceFromLatLon(myLat, myLng, user.location.latitude, user.location.longitude);
-        if (dist <= 1000) {
+
+        if (dist <= selectedDistance) {
           const dp = user.dp || defaultIcon;
           const card = document.createElement('div');
           card.className = 'user-card';
@@ -457,17 +393,21 @@
             <div class="action-buttons">
               ${statusButton}
               <a href="/message/${user._id}" class="chat-btn">💬 Message</a>
-            </div>
-          `;
+            </div>`;
+          
           listContainer.appendChild(card);
         }
       });
 
-      // Hide loading spinner
-      loadingDiv.style.display = 'none';
+      if (!listContainer.hasChildNodes()) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🚫</div>
+            <p>No users found within ${selectedDistance} km.</p>
+          </div>`;
+      }
     }
 
-    // Send friend request
     function sendFriendRequest(toUserId, btn) {
       btn.textContent = "⏳ Pending";
       btn.disabled = true;
@@ -480,7 +420,6 @@
         .then(data => {
           if (data.message === "Already friends") {
             btn.textContent = "✓ Friends";
-            btn.disabled = true;
           } else {
             btn.textContent = "⏳ Pending";
           }
@@ -493,7 +432,6 @@
         });
     }
 
-    // Get current location and fetch users
     function loadNearbyUsers() {
       const loadingDiv = document.querySelector('.loading');
       const listContainer = document.querySelector('.user-list');
@@ -505,14 +443,12 @@
           const myLat = position.coords.latitude;
           const myLng = position.coords.longitude;
 
-          // Save current location
           fetch('/save-location', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ latitude: myLat, longitude: myLng })
           }).catch(err => console.error(err));
 
-          // Fetch other users
           fetch('/api/locations')
             .then(res => res.json())
             .then(users => showUsers(users, myLat, myLng))
@@ -523,8 +459,7 @@
                 <div class="empty-state">
                   <div class="empty-icon">⚠️</div>
                   <p>Failed to load users.</p>
-                </div>
-              `;
+                </div>`;
             });
         }, () => {
           alert("Geolocation not supported or permission denied!");
@@ -536,25 +471,8 @@
       }
     }
 
-    // Initial load
     loadNearbyUsers();
-
-    // Add staggered animation to cards
-    const observer = new MutationObserver(() => {
-      const cards = document.querySelectorAll('.user-card');
-      cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-          card.style.transition = 'all 0.5s ease-out';
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, index * 100);
-      });
-    });
-
-    observer.observe(document.querySelector('.user-list'), { childList: true });
   </script>
 </body>
 </html>
+`
