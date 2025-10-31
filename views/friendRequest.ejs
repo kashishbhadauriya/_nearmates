@@ -677,14 +677,14 @@
                     <div class="user-email"><%= friend.email %></div>
                   </div>
                 </div>
-                <div class="action-buttons">
-                  <form action="/chat/<%= friend._id %>" method="GET" style="display: inline;">
-                    <button type="submit" class="btn btn-chat">
-                      <i class="fas fa-comment"></i>
-                      Chat
-                    </button>
-                  </form>
-                </div>
+              <div class="action-buttons">
+  <form action="/chat/<%= friend._id %>" method="GET" style="display: inline;">
+    <button type="submit" class="btn btn-chat">
+      <i class="fas fa-comment"></i> Chat
+    </button>
+  </form>
+</div>
+
               </li>
             <% }) %>
           </ul>

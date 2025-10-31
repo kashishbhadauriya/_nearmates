@@ -64,16 +64,39 @@ const UserSchema = new mongoose.Schema({
     latitude: Number,
     longitude: Number,
   },
-  
 
+  
 
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
   sentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] 
 
+
+});
+const User = mongoose.model("User", UserSchema);
+const messageSchema = new mongoose.Schema({
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-const User = mongoose.model("User", UserSchema);
+const Message = mongoose.model("Message", messageSchema);
+
 
 app.get("/", (req, res) => {
   res.render("login", { error: null });
@@ -521,11 +544,131 @@ app.get("/checkalluser", (req, res) => {
 
 
 
+app.get("/chat/:friendId", async (req, res) => {
+  const currentUser = req.session.user;
+  const friendId = req.params.friendId;
+
+  const friend = await User.findById(friendId);
+
+  // Fetch all chat messages between both users (sorted oldest → newest)
+  const messages = await Message.find({
+    $or: [
+      { sender: currentUser._id, receiver: friendId },
+      { sender: friendId, receiver: currentUser._id }
+    ]
+  }).sort({ timestamp: 1 });
+
+  res.render("chat", { user: currentUser, friend, messages });
+});
+
+
+
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-);
+const http = require("http");
+const { Server } = require("socket.io");
+
+const server = http.createServer(app);
+const io = new Server(server);
+
+// Start server
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+
+const onlineUsers = new Map();
+io.on("connection", (socket) => {
+  console.log("🟢 New user connected:", socket.id);
+
+  // Store online users
+  socket.on("user-connected", async (userId) => {
+    onlineUsers.set(userId, socket.id);
+    console.log(`✅ User ${userId} connected with socket ${socket.id}`);
+
+    // ✅ Send unread messages to user
+    try {
+      const unreadMessages = await Message.find({
+        receiver: userId,
+        read: false,
+      });
+
+      if (unreadMessages.length > 0) {
+        console.log(`📬 Sending ${unreadMessages.length} unread messages to user ${userId}`);
+      }
+
+      for (const msg of unreadMessages) {
+        socket.emit("private-message", {
+          senderId: msg.sender,
+          message: msg.message,
+          timestamp: msg.timestamp,
+        });
+      }
+
+      // ✅ Mark as read
+      await Message.updateMany(
+        { receiver: userId, read: false },
+        { read: true }
+      );
+    } catch (err) {
+      console.error("❌ Error sending unread messages:", err);
+    }
+  });
+
+  // ✅ Handle private messages
+  socket.on("send-private-message", async ({ senderId, receiverId, message }) => {
+    try {
+      // ✅ Save to DB permanently
+      const newMessage = new Message({
+        sender: senderId,
+        receiver: receiverId,
+        message,
+        read: false,
+        timestamp: new Date(),
+      });
+
+      await newMessage.save();
+
+      console.log(`💾 Message saved between ${senderId} -> ${receiverId}`);
+
+      // ✅ Send message to sender (for instant display)
+      const senderSocket = onlineUsers.get(senderId);
+      if (senderSocket) {
+        io.to(senderSocket).emit("private-message", {
+          senderId,
+          receiverId,
+          message,
+          timestamp: newMessage.timestamp,
+        });
+      }
+
+      // ✅ Send to receiver if online
+      const receiverSocket = onlineUsers.get(receiverId);
+      if (receiverSocket) {
+        io.to(receiverSocket).emit("private-message", {
+          senderId,
+          receiverId,
+          message,
+          timestamp: newMessage.timestamp,
+        });
+      } else {
+        console.log(`📭 Receiver ${receiverId} is offline. Message saved in DB.`);
+      }
+    } catch (err) {
+      console.error("❌ Error sending private message:", err);
+    }
+  });
+
+  // ✅ Handle disconnect
+  socket.on("disconnect", () => {
+    for (let [userId, id] of onlineUsers.entries()) {
+      if (id === socket.id) {
+        onlineUsers.delete(userId);
+        console.log(`🔴 User ${userId} disconnected`);
+        break;
+      }
+    }
+  });
+});
