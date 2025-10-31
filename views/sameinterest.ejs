@@ -360,7 +360,10 @@
             <span class="interest-badge"><%= user.interests %></span>
             <p><strong>City:</strong> <%= user.city || 'Not specified' %></p>
             <p><strong>About:</strong> <%= user.about || 'No info' %></p>
-            <a href="/Message/<%= user._id %>" class="chat-btn">Message</a>
+<a href="/chat/<%= user._id %>" class="chat-btn">Message</a>
+<form action="/add-friend/<%= user._id %>" method="POST" style="display:inline;">
+  <button type="submit" class="add-friend-btn">Add Friend</button>
+</form>
           </div>
         <% }) %>
       </div>
