@@ -184,18 +184,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
 // Profile 
 
 app.get("/profile", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
 
   try {
-    const currentUser = await User.findOne({ name: req.session.user.username });
+    const currentUser = await User.findById(req.session.user._id);
+    if (!currentUser) {
+      console.log(" No user found for ID:", req.session.user._id);
+      return res.redirect("/dashboard");
+    }
+
     res.render("profile", { user: currentUser });
   } catch (err) {
-    console.error(err);
-    res.redirect("/dashboard");
+    console.error(" Profile error:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -211,19 +215,13 @@ app.post("/update-profile", upload.single("dp"), async (req, res) => {
     const updateData = { dob, occupation, state, city, interests, favSports, about };
     if (dp) updateData.dp = dp;
 
-    await User.findOneAndUpdate(
-      { name: req.session.user.username },
-      updateData,
-      { new: true }
-    );
-
+    await User.findByIdAndUpdate(req.session.user._id, updateData, { new: true });
     res.redirect("/profile");
   } catch (err) {
-    console.error(err);
-    res.redirect("/profile");
+    console.error("❌ Update profile error:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
-
 
 
 
@@ -240,9 +238,6 @@ app.get("/dashboard", (req, res) => {
 });
 
 
-
-
-
 //get for map
 app.get("/map", (req, res) => {
   if (!req.session.user) return res.redirect("/");
@@ -255,7 +250,6 @@ app.get("/learnaboutsafety", (req, res) => {
   if (!req.session.user) return res.redirect("/");
   res.render("aboutSafety", { user: req.session.user });
 });
-
 
 //get for mapdetails
 app.get("/mapdetails", async (req, res) => {
@@ -272,16 +266,12 @@ app.get("/mapdetails", async (req, res) => {
 });
 
 
-
-
-
 app.get("/about", (req, res) => {
   if (!req.session.user) return res.redirect("/");
   res.render("about", { user: req.session.user });
 });
 
 
-//
 app.post("/save-location", async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
 
@@ -423,12 +413,7 @@ app.post("/friend-request/:toUserId", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
+// Accept Friend Request
 
 app.post("/friend-request/accept/:fromUserId", async (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
@@ -478,7 +463,6 @@ app.post("/friend-request/reject/:fromUserId", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 
 
@@ -576,19 +560,18 @@ const io = new Server(server);
 
 // Start server
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(` Server running on http://localhost:${PORT}`);
 });
 
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
-  console.log("🟢 New user connected:", socket.id);
+  console.log("New user connected:", socket.id);
 
   // Store online users
   socket.on("user-connected", async (userId) => {
     onlineUsers.set(userId, socket.id);
-    console.log(`✅ User ${userId} connected with socket ${socket.id}`);
+    console.log(` User ${userId} connected with socket ${socket.id}`);
 
-    // ✅ Send unread messages to user
     try {
       const unreadMessages = await Message.find({
         receiver: userId,
@@ -596,7 +579,7 @@ io.on("connection", (socket) => {
       });
 
       if (unreadMessages.length > 0) {
-        console.log(`📬 Sending ${unreadMessages.length} unread messages to user ${userId}`);
+        console.log(` Sending ${unreadMessages.length} unread messages to user ${userId}`);
       }
 
       for (const msg of unreadMessages) {
@@ -607,20 +590,20 @@ io.on("connection", (socket) => {
         });
       }
 
-      // ✅ Mark as read
+      //  Mark as read
       await Message.updateMany(
         { receiver: userId, read: false },
         { read: true }
       );
     } catch (err) {
-      console.error("❌ Error sending unread messages:", err);
+      console.error(" Error sending unread messages:", err);
     }
   });
 
-  // ✅ Handle private messages
+  //  Handle private messages
   socket.on("send-private-message", async ({ senderId, receiverId, message }) => {
     try {
-      // ✅ Save to DB permanently
+      //  Save to DB permanently
       const newMessage = new Message({
         sender: senderId,
         receiver: receiverId,
@@ -631,9 +614,9 @@ io.on("connection", (socket) => {
 
       await newMessage.save();
 
-      console.log(`💾 Message saved between ${senderId} -> ${receiverId}`);
+      console.log(` Message saved between ${senderId} -> ${receiverId}`);
 
-      // ✅ Send message to sender (for instant display)
+      // Send message to sender (for instant display)
       const senderSocket = onlineUsers.get(senderId);
       if (senderSocket) {
         io.to(senderSocket).emit("private-message", {
@@ -644,7 +627,6 @@ io.on("connection", (socket) => {
         });
       }
 
-      // ✅ Send to receiver if online
       const receiverSocket = onlineUsers.get(receiverId);
       if (receiverSocket) {
         io.to(receiverSocket).emit("private-message", {
@@ -654,19 +636,17 @@ io.on("connection", (socket) => {
           timestamp: newMessage.timestamp,
         });
       } else {
-        console.log(`📭 Receiver ${receiverId} is offline. Message saved in DB.`);
+        console.log(` Receiver ${receiverId} is offline. Message saved in DB.`);
       }
     } catch (err) {
-      console.error("❌ Error sending private message:", err);
+      console.error(" Error sending private message:", err);
     }
   });
-
-  // ✅ Handle disconnect
   socket.on("disconnect", () => {
     for (let [userId, id] of onlineUsers.entries()) {
       if (id === socket.id) {
         onlineUsers.delete(userId);
-        console.log(`🔴 User ${userId} disconnected`);
+        console.log(` User ${userId} disconnected`);
         break;
       }
     }
