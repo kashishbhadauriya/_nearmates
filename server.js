@@ -5,10 +5,10 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const session = require("express-session");
-const validator = require("validator"); 
-const passport = require("passport");
+//const validator = require("validator"); 
+//const passport = require("passport");
 const dotenv = require("dotenv");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+//const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bodyParser = require("body-parser");
 const { createTokenForUser, checkForAuthentication } = require("./authMiddleware");
 
@@ -18,8 +18,8 @@ const PORT = 3000;
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
-app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.initialize());
+//app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
