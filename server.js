@@ -6,6 +6,9 @@ const multer = require("multer");
 const path = require("path");
 const session = require("express-session");
 const validator = require("validator"); 
+const passport = require("passport");
+const dotenv = require("dotenv");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bodyParser = require("body-parser");
 const { createTokenForUser, checkForAuthentication } = require("./authMiddleware");
 
@@ -15,6 +18,8 @@ const PORT = 3000;
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -74,7 +79,7 @@ const UserSchema = new mongoose.Schema({
 
 });
 const User = mongoose.model("User", UserSchema);
-const messageSchema = new mongoose.Schema({
+  const messageSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -536,6 +541,51 @@ app.get("/checkalluser", (req, res) => {
 });
 
 
+app.get("/chats", async (req, res) => {
+  try {
+    const loggedInUser = req.session.user;
+    if (!loggedInUser) return res.redirect("/login");
+
+    // Fetch all messages involving this user
+    const messages = await Message.find({
+      $or: [
+        { sender: loggedInUser._id },
+        { receiver: loggedInUser._id }
+      ]
+    })
+      .populate("sender receiver", "name dp")
+      .sort({ timestamp: -1 });
+
+    const userMap = new Map();
+
+    messages.forEach(msg => {
+      const isSender = msg.sender._id.toString() === loggedInUser._id.toString();
+      const otherUser = isSender ? msg.receiver : msg.sender;
+
+      if (!userMap.has(otherUser._id.toString())) {
+        userMap.set(otherUser._id.toString(), {
+          _id: otherUser._id,
+          name: otherUser.name,
+          dp: otherUser.dp,
+          lastMessage:
+            isSender
+              ? `You: ${msg.message}` // show who sent
+              : msg.message,
+          lastTime: msg.timestamp,
+        });
+      }
+    });
+
+    const users = Array.from(userMap.values());
+    users.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
+
+    res.render("chatList", { users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading chat list");
+  }
+});
+
 
 app.get("/chat/:friendId", async (req, res) => {
   const currentUser = req.session.user;
@@ -661,3 +711,7 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+
+
+

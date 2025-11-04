@@ -701,6 +701,29 @@
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.chat-float-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background-color: #25d366; 
+  color: white;
+  font-size: 24px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s, background 0.3s;
+  z-index: 9999;
+}
+
+.chat-float-btn:hover {
+  background-color: #1ebd5f;
+  transform: scale(1.05);
+}
 
 
 
@@ -716,6 +739,7 @@
         <ul class="nav-links">
           <li><a href="#home">Home</a></li>
           <li><a href="/about">About</a></li>
+          
 
          <a href="/friendRequest" class="nav-item" style="position: relative;">
   <i class="fas fa-user-friends"><span style="font-family: 'Poppins', sans-serif; font-weight: 500; margin-left: 6px;">
@@ -750,6 +774,9 @@
         </ul>
       </div>
     </nav>
+    <!-- 💬 Floating Chat Button -->
+
+
 
     <section class="hero" id="home">
       <div class="hero-content">
@@ -768,6 +795,10 @@
           </a>
         </div>
       </div>
+      <a href="/chats" class="chat-float-btn">
+  <i class="fas fa-comments"></i>
+</a>
+
     </section>
 
     <div class="main-content">

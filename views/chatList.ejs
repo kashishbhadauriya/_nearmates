@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Chats</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      animation: fadeInDown 0.6s ease;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .chat-list {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .search-bar {
+      padding: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .search-bar input {
+      width: 100%;
+      padding: 12px 20px 12px 45px;
+      border: 2px solid #f0f0f0;
+      border-radius: 25px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: #f8f9fa;
+    }
+    
+    .search-bar input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+    
+    .search-icon {
+      position: relative;
+    }
+    
+    .search-icon i {
+      position: absolute;
+      left: 35px;
+      top: 33px;
+      color: #999;
+    }
+    
+    .chat-user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 18px 20px;
+      border-bottom: 1px solid #f5f5f5;
+      text-decoration: none;
+      color: #000;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .chat-user:hover {
+      background: linear-gradient(90deg, #f8f9ff 0%, #fff 100%);
+      transform: translateX(5px);
+    }
+    
+    .chat-user:last-child {
+      border-bottom: none;
+    }
+    
+    .avatar-container {
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .chat-user img {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #f0f0f0;
+      transition: all 0.3s;
+    }
+    
+    .chat-user:hover img {
+      border-color: #667eea;
+      transform: scale(1.05);
+    }
+    
+    .online-status {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: #4caf50;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+    
+    .chat-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .chat-user strong {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .last-message {
+      font-size: 14px;
+      color: #777;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .empty-state i {
+      font-size: 60px;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+      font-size: 20px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+      font-size: 14px;
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 26px;
+      }
+      
+      .chat-list {
+        border-radius: 15px;
+      }
+      
+      .chat-user img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-comments"></i> Your Chats</h1>
+      <p>Stay connected with your conversations</p>
+    </div>
+    
+    <div class="chat-list">
+      <div class="search-bar search-icon">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search conversations..." id="searchInput">
+      </div>
+      
+      <div id="chatContainer">
+        <% if (users.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No chats yet</h3>
+            <p>Start a conversation to see it here</p>
+          </div>
+        <% } else { %>
+          <% users.forEach(user => { %>
+            <a href="/chat/<%= user._id %>" class="chat-user">
+              <div class="avatar-container">
+                <img src="<%= user.dp || '/default-dp.png' %>" alt="<%= user.name %>">
+                <span class="online-status"></span>
+              </div>
+              <div class="chat-info">
+                <div class="chat-header">
+                  <strong><%= user.name %></strong>
+                  <span class="time">Now</span>
+                </div>
+                <span class="last-message"><%= user.lastMessage ? user.lastMessage : 'Tap to chat' %></span>
+              </div>
+            </a>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const chatUsers = document.querySelectorAll('.chat-user');
+    
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      chatUsers.forEach(user => {
+        const username = user.querySelector('strong').textContent.toLowerCase();
+        const message = user.querySelector('.last-message').textContent.toLowerCase();
+        
+        if (username.includes(searchTerm) || message.includes(searchTerm)) {
+          user.style.display = 'flex';
+        } else {
+          user.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
