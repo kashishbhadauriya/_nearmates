@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const session = require("express-session");
-//const validator = require("validator"); 
+const validator = require("validator"); 
 //const passport = require("passport");
 const dotenv = require("dotenv");
 //const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -418,12 +418,12 @@ app.post("/friend-request/:toUserId", async (req, res) => {
 
     await user.save();
     await toUser.save();
+   return  res.redirect("/sameinterest"); // ✅ refresh page → request sent
 
-    res.json({ message: "Request sent", status: "Pending" });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    return res.redirect("/sameinterest"); // ❌ on error, still redirect
   }
 });
 
