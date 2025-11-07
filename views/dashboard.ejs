@@ -726,9 +726,6 @@
 }
 
 
-
-
-
     </style>
   </head>
   <body>
@@ -774,9 +771,7 @@
         </ul>
       </div>
     </nav>
-    <!-- 💬 Floating Chat Button -->
-
-
+  
 
     <section class="hero" id="home">
       <div class="hero-content">
@@ -849,7 +844,6 @@
           </div>
         </div>
 
-        <!-- Features List -->
         <div class="features-list reveal">
           <h2>What You Can Do Here</h2>
           <div class="features-grid">
@@ -934,9 +928,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Stats Section -->
-
     <!-- Footer -->
     <footer id="contact">
       <div class="footer-content">
@@ -950,19 +941,33 @@
           <a href="mailto:2k23.csai2310628@gmail.com" class="footer-link">
             <i class="fas fa-envelope"></i>
             2k23.csai2310628@gmail.com
+            <br>
+            tsingh098.btech2033@cse.nitrr.ac.in
           </a>
           <a href="tel:+918090279585" class="footer-link">
             <i class="fas fa-phone"></i>
-            +91 80XXXXXXXX
+            +91 8090279585
+            <br>
+            +91 8299877735
           </a>
-          <a
-            href="https://www.linkedin.com/in/kashish-bhadauriya-80781b316/"
-            target="_blank"
-            class="footer-link"
-          >
-            <i class="fab fa-linkedin"></i>
-            LinkedIn Profile
-          </a>
+         <a
+  href="https://www.linkedin.com/in/kashish-bhadauriya-80781b316/"
+  target="_blank"
+  class="footer-link"
+>
+  <i class="fab fa-linkedin"></i>
+  Kashish Bhadauriya
+</a>
+
+<a
+  href="https://www.linkedin.com/in/tanish-singh-901537289/"
+  target="_blank"
+  class="footer-link"
+>
+  <i class="fab fa-linkedin"></i>
+  Tanish Singh
+</a>
+
         </div>
 
         <div class="footer-bottom">
@@ -972,7 +977,6 @@
     </footer>
 
     <script>
-      // Smooth scrolling for navigation links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener("click", function (e) {
           e.preventDefault();
@@ -982,7 +986,6 @@
         });
       });
 
-      // Navbar scroll effect
       window.addEventListener("scroll", () => {
         const navbar = document.querySelector(".navbar");
         if (window.scrollY > 50) {
@@ -992,7 +995,7 @@
         }
       });
 
-      // Reveal animations on scroll
+  
       const reveals = document.querySelectorAll(".reveal");
 
       function revealOnScroll() {
@@ -1008,9 +1011,8 @@
       }
 
       window.addEventListener("scroll", revealOnScroll);
-      revealOnScroll(); // Check on page load
+      revealOnScroll(); 
 
-      // Counter animation for stats
       function animateCounters() {
         const counters = document.querySelectorAll(".stat-number");
         const speed = 200;
@@ -1039,7 +1041,6 @@
         });
       }
 
-      // Trigger counter animation when stats section is visible
       const statsSection = document.querySelector(".stats-section");
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -1052,7 +1053,6 @@
 
       observer.observe(statsSection);
 
-      // Add hover effects to feature cards
       document.querySelectorAll(".feature-card").forEach((card) => {
         card.addEventListener("mouseenter", function () {
           this.style.transform = "translateY(-15px) scale(1.02)";
@@ -1077,13 +1077,11 @@
       });
     </script>
     <script>
-  // Show message only once per visit
   if (!sessionStorage.getItem("refreshMessageShown")) {
     const msg = document.getElementById("refreshMessage");
     msg.style.display = "block";
     sessionStorage.setItem("refreshMessageShown", "true");
 
-    // Hide after 10 seconds
     setTimeout(() => {
       msg.style.display = "none";
     }, 10000);

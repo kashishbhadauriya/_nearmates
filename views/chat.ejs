@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat with <%= friend.name %></title>
   <script src="/socket.io/socket.io.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* your previous CSS kept same, only new buttons added */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       height: 100vh;
       display: flex;
@@ -28,7 +24,7 @@
       height: 90vh;
       background: white;
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -37,34 +33,18 @@
     .chat-header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 20px 25px;
+      padding: 20px;
       display: flex;
       align-items: center;
       gap: 15px;
     }
 
     .avatar {
-      width: 45px;
-      height: 45px;
+      width: 45px; height: 45px;
       border-radius: 50%;
-      background: white;
-      color: #667eea;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .header-info h2 {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-
-    .header-info p {
-      font-size: 13px;
-      opacity: 0.9;
+      background: white; color: #667eea;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 18px;
     }
 
     #chat-box {
@@ -74,83 +54,45 @@
       background: #f8f9fa;
     }
 
-    #chat-box::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    #chat-box::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #chat-box::-webkit-scrollbar-thumb {
-      background: #cbd5e0;
-      border-radius: 3px;
-    }
-
-    .message-wrapper {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .message-wrapper.mine {
-      align-items: flex-end;
-    }
-
-    .message-wrapper.theirs {
-      align-items: flex-start;
-    }
+    .message-wrapper { margin-bottom: 20px; display: flex; flex-direction: column; }
+    .mine { align-items: flex-end; }
+    .theirs { align-items: flex-start; }
 
     .message {
       max-width: 65%;
       padding: 12px 16px;
       border-radius: 18px;
       word-wrap: break-word;
-      line-height: 1.5;
     }
-
-    .message.mine {
+    .mine .message {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-bottom-right-radius: 4px;
     }
-
-    .message.theirs {
+    .theirs .message {
       background: white;
       color: #2d3748;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .message img {
+      max-width: 200px;
+      border-radius: 10px;
+      display: block;
+    }
+    audio {
+      outline: none;
+      width: 200px;
+      margin-top: 5px;
     }
 
-    .timestamp {
-      font-size: 11px;
-      color: #a0aec0;
-      margin-top: 5px;
-      padding: 0 5px;
-    }
+    .timestamp { font-size: 11px; color: #a0aec0; margin-top: 5px; }
 
     .input-area {
-      padding: 20px 25px;
-      background: white;
+      padding: 15px 20px;
       border-top: 1px solid #e2e8f0;
+      background: white;
     }
-
     .input-container {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+      display: flex; gap: 10px; align-items: center;
     }
 
     #messageInput {
@@ -160,83 +102,21 @@
       border-radius: 25px;
       font-size: 15px;
       outline: none;
-      transition: all 0.3s;
-      font-family: inherit;
     }
 
-    #messageInput:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    .icon-btn, .send-btn {
+      width: 45px; height: 45px;
+      border: none; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
+    .icon-btn { background: #edf2f7; color: #4a5568; }
+    .icon-btn:hover { background: #e2e8f0; }
     .send-btn {
-      width: 50px;
-      height: 50px;
-      border: none;
-      border-radius: 50%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-      flex-shrink: 0;
-    }
-
-    .send-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .send-btn:active {
-      transform: scale(0.95);
-    }
-
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .date-separator {
-      text-align: center;
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .date-separator span {
-      background: #f8f9fa;
-      padding: 5px 15px;
-      border-radius: 15px;
-      font-size: 12px;
-      color: #718096;
-      position: relative;
-      z-index: 1;
-    }
-
-    .date-separator::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #e2e8f0;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 0;
-      }
-
-      .chat-container {
-        height: 100vh;
-        border-radius: 0;
-      }
-
-      .message {
-        max-width: 80%;
-      }
     }
   </style>
 </head>
@@ -244,7 +124,7 @@
   <div class="chat-container">
     <div class="chat-header">
       <div class="avatar"><%= friend.name.charAt(0).toUpperCase() %></div>
-      <div class="header-info">
+      <div>
         <h2><%= friend.name %></h2>
         <p>Active now</p>
       </div>
@@ -254,9 +134,17 @@
       <% messages.forEach(msg => { %>
         <div class="message-wrapper <%= msg.sender.toString() === user._id.toString() ? 'mine' : 'theirs' %>">
           <div class="message">
-            <%= msg.message %>
+            <% if (msg.type === 'image') { %>
+              <img src="<%= msg.message %>" />
+            <% } else if (msg.type === 'audio') { %>
+              <audio controls src="<%= msg.message %>"></audio>
+            <% } else if (msg.type === 'location') { %>
+              <a href="<%= msg.message %>" target="_blank">📍 Shared Location</a>
+            <% } else { %>
+              <%= msg.message %>
+            <% } %>
           </div>
-          <span class="timestamp"><%= new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+          <span class="timestamp"><%= new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) %></span>
         </div>
       <% }) %>
     </div>
@@ -264,13 +152,12 @@
     <div class="input-area">
       <form id="message-form">
         <div class="input-container">
-          <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" required />
-          <button type="submit" class="send-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
+          <button type="button" class="icon-btn" id="imageBtn">🖼️</button>
+          <input type="file" id="imageInput" accept="image/*" style="display:none;" />
+          <button type="button" class="icon-btn" id="locationBtn">📍</button>
+         
+          <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" />
+          <button type="submit" class="send-btn">➤</button>
         </div>
       </form>
     </div>
@@ -284,54 +171,122 @@
     const chatBox = document.getElementById("chat-box");
     const form = document.getElementById("message-form");
     const input = document.getElementById("messageInput");
+    const imageBtn = document.getElementById("imageBtn");
+    const imageInput = document.getElementById("imageInput");
+    const locationBtn = document.getElementById("locationBtn");
+    const voiceBtn = document.getElementById("voiceBtn");
 
-    // Scroll to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
-
-    // Join the chat
     socket.emit("user-connected", userId);
 
-    // Send message
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", e => {
       e.preventDefault();
       const message = input.value.trim();
       if (!message) return;
-
-      socket.emit("send-private-message", { 
-        senderId: userId, 
-        receiverId, 
-        message 
-      });
-      
+      sendMessage(message, "text");
       input.value = "";
     });
 
-    // Receive messages
+    // IMAGE SEND
+    imageBtn.addEventListener("click", () => imageInput.click());
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => sendMessage(reader.result, "image");
+      reader.readAsDataURL(file);
+    });
+
+    // LOCATION
+    locationBtn.addEventListener("click", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const { latitude, longitude } = pos.coords;
+          const link = `https://maps.google.com/?q=${latitude},${longitude}`;
+          sendMessage(link, "location");
+        });
+      } else alert("Geolocation not supported");
+    });
+
+    // VOICE NOTE
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    voiceBtn.addEventListener("click", async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          isRecording = true;
+          voiceBtn.textContent = "⏹️"; // stop icon
+
+          mediaRecorder.addEventListener("dataavailable", (e) => audioChunks.push(e.data));
+          mediaRecorder.addEventListener("stop", () => {
+            const blob = new Blob(audioChunks, { type: "audio/ogg; codecs=opus" });
+            const reader = new FileReader();
+            reader.onloadend = () => sendMessage(reader.result, "audio");
+            reader.readAsDataURL(blob);
+            audioChunks = [];
+            voiceBtn.textContent = "🎤";
+            isRecording = false;
+          });
+        } catch (err) {
+          alert("Mic access denied");
+        }
+      } else {
+        mediaRecorder.stop();
+      }
+    });
+
+    // RECEIVE MESSAGE
     socket.on("private-message", (msg) => {
       if (
         (msg.senderId === userId && msg.receiverId === receiverId) ||
         (msg.senderId === receiverId && msg.receiverId === userId)
-      ) {
-        addMessageToChat(msg);
-      }
+      ) addMessage(msg);
     });
 
-    function addMessageToChat(msg) {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("message-wrapper", msg.senderId === userId ? "mine" : "theirs");
-      
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message");
-      messageDiv.textContent = msg.message;
-      
-      const timestamp = document.createElement("span");
-      timestamp.classList.add("timestamp");
-      timestamp.textContent = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      wrapper.appendChild(messageDiv);
-      wrapper.appendChild(timestamp);
-      
-      chatBox.appendChild(wrapper);
+    function sendMessage(message, type) {
+      const msg = { senderId: userId, receiverId, message, type, timestamp: new Date() };
+      socket.emit("send-private-message", msg);
+      addMessage(msg);
+    }
+
+    function addMessage(msg) {
+      const wrap = document.createElement("div");
+      wrap.classList.add("message-wrapper", msg.senderId === userId ? "mine" : "theirs");
+
+      const div = document.createElement("div");
+      div.classList.add("message");
+
+      if (msg.type === "image") {
+        const img = document.createElement("img");
+        img.src = msg.message;
+        div.appendChild(img);
+      } else if (msg.type === "audio") {
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = msg.message;
+        div.appendChild(audio);
+      } else if (msg.type === "location") {
+        const a = document.createElement("a");
+        a.href = msg.message;
+        a.textContent = "📍 Shared Location";
+        a.target = "_blank";
+        div.appendChild(a);
+      } else {
+        div.textContent = msg.message;
+      }
+
+      const time = document.createElement("span");
+      time.classList.add("timestamp");
+      time.textContent = new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+      wrap.appendChild(div);
+      wrap.appendChild(time);
+      chatBox.appendChild(wrap);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>

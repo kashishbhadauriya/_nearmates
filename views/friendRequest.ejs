@@ -581,7 +581,6 @@
       </div>
     </div>
 
-    <!-- Friend Requests Section -->
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Friend Requests</h2>
@@ -638,10 +637,9 @@
       </div>
     </section>
 
-    <!-- Section Divider -->
     <div class="section-divider"></div>
 
-    <!-- Friends Section -->
+  
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Your Friends</h2>
@@ -684,7 +682,6 @@
     </button>
   </form>
 </div>
-
               </li>
             <% }) %>
           </ul>
@@ -694,7 +691,6 @@
   </div>
 
   <script>
-    // Navbar scroll effect
     window.addEventListener('scroll', () => {
       const navbar = document.querySelector('.navbar');
       if (window.scrollY > 10) {
@@ -704,7 +700,6 @@
       }
     });
 
-    // Enhanced hover effects for user cards
     document.querySelectorAll('.user-card').forEach(card => {
       card.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-4px)';
@@ -715,7 +710,6 @@
       });
     });
 
-    // Button click animations
     document.querySelectorAll('.btn').forEach(button => {
       button.addEventListener('click', function(e) {
         const ripple = document.createElement('span');
@@ -742,7 +736,6 @@
       });
     });
 
-    // Add ripple animation
     const style = document.createElement('style');
     style.textContent = `
       @keyframes ripple {
@@ -754,7 +747,6 @@
     `;
     document.head.appendChild(style);
 
-    // Smooth page loading animation
     document.addEventListener('DOMContentLoaded', () => {
       const cards = document.querySelectorAll('.user-card, .stat-card');
       cards.forEach((card, index) => {

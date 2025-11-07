@@ -447,7 +447,7 @@ app.post("/friend-request/accept/:fromUserId", async (req, res) => {
 
     await currentUser.save();
     await fromUser.save();
-    res.redirect("/friendRequest"); // ✅ refresh page → request gone
+    res.redirect("/friendRequest"); 
 
   } catch (err) {
     console.error(err);
