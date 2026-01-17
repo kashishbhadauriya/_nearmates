@@ -541,7 +541,7 @@ app.get("/checkalluser", (req, res) => {
 });
 
 
-app.get("/chats", async (req, res) => {
+app.get("/chat", async (req, res) => {
   try {
     const loggedInUser = req.session.user;
     if (!loggedInUser) return res.redirect("/login");
@@ -557,24 +557,30 @@ app.get("/chats", async (req, res) => {
       .sort({ timestamp: -1 });
 
     const userMap = new Map();
+messages.forEach(msg => {
+  // 🛑 Skip messages with deleted users
+  if (!msg.sender || !msg.receiver) return;
 
-    messages.forEach(msg => {
-      const isSender = msg.sender._id.toString() === loggedInUser._id.toString();
-      const otherUser = isSender ? msg.receiver : msg.sender;
+  const isSender =
+    msg.sender._id.toString() === loggedInUser._id.toString();
 
-      if (!userMap.has(otherUser._id.toString())) {
-        userMap.set(otherUser._id.toString(), {
-          _id: otherUser._id,
-          name: otherUser.name,
-          dp: otherUser.dp,
-          lastMessage:
-            isSender
-              ? `You: ${msg.message}` // show who sent
-              : msg.message,
-          lastTime: msg.timestamp,
-        });
-      }
+  const otherUser = isSender ? msg.receiver : msg.sender;
+
+  if (!otherUser || !otherUser._id) return;
+
+  if (!userMap.has(otherUser._id.toString())) {
+    userMap.set(otherUser._id.toString(), {
+      _id: otherUser._id,
+      name: otherUser.name,
+      dp: otherUser.dp,
+      lastMessage: isSender
+        ? `You: ${msg.message}`
+        : msg.message,
+      lastTime: msg.timestamp,
     });
+  }
+});
+
 
     const users = Array.from(userMap.values());
     users.sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));

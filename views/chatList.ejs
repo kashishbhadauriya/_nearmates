@@ -239,32 +239,38 @@
       </div>
       
       <div id="chatContainer">
-        <% if (users.length === 0) { %>
-          <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h3>No chats yet</h3>
-            <p>Start a conversation to see it here</p>
+  <% if (!users || users.length === 0) { %>
+    <div class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <h3>No chats yet</h3>
+      <p>Start a conversation to see it here</p>
+    </div>
+  <% } else { %>
+    <% users.forEach(user => { %>
+      <% if (user) { %>
+        <a href="/chat/<%= user._id %>" class="chat-user">
+          <div class="avatar-container">
+            <img src="<%= user.dp || '/default-dp.png' %>" alt="<%= user.name %>">
+            <span class="online-status"></span>
           </div>
-        <% } else { %>
-          <% users.forEach(user => { %>
-            <a href="/chat/<%= user._id %>" class="chat-user">
-              <div class="avatar-container">
-                <img src="<%= user.dp || '/default-dp.png' %>" alt="<%= user.name %>">
-                <span class="online-status"></span>
-              </div>
-              <div class="chat-info">
-                <div class="chat-header">
-                  <strong><%= user.name %></strong>
-                  <span class="time">Now</span>
-                </div>
-                <span class="last-message"><%= user.lastMessage ? user.lastMessage : 'Tap to chat' %></span>
-              </div>
-            </a>
-          <% }) %>
-        <% } %>
-      </div>
+          <div class="chat-info">
+            <div class="chat-header">
+              <strong><%= user.name %></strong>
+              <span class="time">Now</span>
+            </div>
+            <span class="last-message">
+              <%= user.lastMessage || 'Tap to chat' %>
+            </span>
+          </div>
+        </a>
+      <% } %>
+    <% }) %>
+  <% } %>
+</div>
     </div>
   </div>
+  
+
   
   <script>
     const searchInput = document.getElementById('searchInput');
