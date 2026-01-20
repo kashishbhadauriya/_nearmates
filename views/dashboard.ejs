@@ -121,6 +121,58 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
       }
+      /* ================= MOBILE NAVBAR FIX ================= */
+
+/* Hamburger Icon */
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #667eea;
+}
+
+/* Mobile Menu */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.97);
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 25px 0;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideDown 0.3s ease;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  body.dark-mode .nav-links {
+    background: #1e1e1e;
+  }
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
       /* Hero Section */
       .hero {
@@ -733,7 +785,14 @@
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo"><i class="fas fa-heart"></i> NearMates</div>
-        <ul class="nav-links">
+
+<!-- Hamburger -->
+<div class="menu-toggle" id="menuToggle">
+  <i class="fas fa-bars"></i>
+</div>
+
+<ul class="nav-links" id="navLinks">
+
           <li><a href="#home">Home</a></li>
           <li><a href="/about">About</a></li>
           
@@ -1073,5 +1132,25 @@
     }, 10000);
   }
 </script>
+<script>
+  const menuToggle = document.getElementById("menuToggle");
+  const navLinks = document.getElementById("navLinks");
+
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+    menuToggle.innerHTML = navLinks.classList.contains("active")
+      ? '<i class="fas fa-times"></i>'
+      : '<i class="fas fa-bars"></i>';
+  });
+
+  // Auto close menu when link clicked
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("active");
+      menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    });
+  });
+</script>
+
   </body>
 </html>
