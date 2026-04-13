@@ -7,6 +7,7 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
 
   <style>
     :root {
@@ -302,6 +303,96 @@
     .user-card {
       animation: fadeInUp 0.5s ease-out;
     }
+    /* ================= RESPONSIVE ================= */
+
+/* Tablet */
+@media (max-width: 768px) {
+  body {
+    padding: 20px 10px;
+  }
+
+  .container {
+    padding: 20px;
+    margin-top: 50px;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  .distance-filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  #distanceRange {
+    width: 100%;
+  }
+
+  .refresh-btn {
+    width: 100%;
+  }
+
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .user-card img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .chat-btn,
+  .add-friend-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-back {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+
+  .user-info b {
+    font-size: 1rem;
+  }
+
+  .user-info span {
+    font-size: 0.8rem;
+  }
+
+  .distance-badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+}
   </style>
 </head>
 <body>
@@ -309,8 +400,12 @@
     <button type="button" class="btn-back" onclick="window.history.back()">← Back</button>
   </div>
 
-  <div class="container">
+  <div class="container  ">
     <h2>Nearby Users</h2>
+  alert("No users found within the selected interest range");
+  
+
+   
     <p class="header-subtitle">Discover users around you with similar interests</p>
 
     <!-- Distance Filter -->
@@ -472,7 +567,11 @@
     }
 
     loadNearbyUsers();
+      window.onload = function () {
+  alert("⚠️ No users found within the selected interest range");
+};
   </script>
+
 </body>
 </html>
 `
