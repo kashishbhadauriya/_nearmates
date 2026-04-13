@@ -218,15 +218,40 @@ app.get("/profile", async (req, res) => {
 app.post("/update-profile", upload.single("dp"), async (req, res) => {
   if (!req.session.user) return res.redirect("/");
 
-  const { dob, occupation, state, city, interests, favSports, about } = req.body;
-  const dp = req.file ? "/uploads/" + req.file.filename : null;
+  const { 
+    dob, 
+    occupation, 
+    state, 
+    city, 
+    interests, 
+    favSports, 
+    about,
+    selectedAvatar   // 👈 NEW FIELD
+  } = req.body;
 
   try {
-    const updateData = { dob, occupation, state, city, interests, favSports, about };
-    if (dp) updateData.dp = dp;
+    let updateData = { dob, occupation, state, city, interests, favSports, about };
 
-    await User.findByIdAndUpdate(req.session.user._id, updateData, { new: true });
+    // ✅ Priority logic
+    if (req.file) {
+      // 1️⃣ User uploaded image
+      updateData.dp = "/uploads/" + req.file.filename;
+
+    } else if (selectedAvatar) {
+      // 2️⃣ User selected default avatar
+      updateData.dp = selectedAvatar;
+
+    }
+    // 3️⃣ else → keep old dp (no change)
+
+    await User.findByIdAndUpdate(
+      req.session.user._id,
+      updateData,
+      { new: true }
+    );
+
     res.redirect("/profile");
+
   } catch (err) {
     console.error("❌ Update profile error:", err);
     res.status(500).send("Internal Server Error");
@@ -307,34 +332,50 @@ app.post("/save-location", async (req, res) => {
 //fetch locations of all users except current username
 app.get("/api/locations", async (req, res) => {
   try {
+    if (!req.session.user) {
+      return res.status(401).json({ error: "Not logged in" });
+    }
+
     const currentUser = await User.findById(req.session.user._id);
 
-    const users = await User.find(
-      { "location.latitude": { $exists: true }, 
-      "location.longitude": { $exists: true },
-       _id: { $ne: currentUser._id } },//$ne-not equal operator in MongoDB.
-      { name: 1, location: 1, interests: 1, dp: 1, friends: 1, friendRequests: 1, sentRequests: 1 }
-    );
+    // ✅ GET ALL USERS (no restriction)
+    const users = await User.find({
+      _id: { $ne: currentUser._id }
+    });
 
     const result = users.map(u => {
-      let status = "Add Friend";
-      if (currentUser.friends.includes(u._id)) status = "Friends";
-      else if (u.friendRequests.includes(currentUser._id) || currentUser.sentRequests.includes(u._id)) status = "Pending";
+      let status = "None";
+
+      if (currentUser.friends.includes(u._id)) {
+        status = "Friends";
+      } 
+      else if (
+        u.friendRequests.includes(currentUser._id) ||
+        currentUser.sentRequests.includes(u._id)
+      ) {
+        status = "Pending";
+      }
 
       return {
         _id: u._id,
         name: u.name,
-        dp: u.dp,
-        location: u.location,
+        email: u.email,          // ✅ ADDED
+        city: u.city,            // ✅ ADDED
+        state: u.state,          // ✅ ADDED
+        //dp: u.dp,
         interests: u.interests,
+        favSports: u.favSports,  // ✅ ADDED
+        about: u.about,          // ✅ ADDED
+        location: u.location,
         requestStatus: status
       };
     });
 
     res.json(result);
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to fetch locations" });
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 });
 

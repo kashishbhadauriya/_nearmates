@@ -375,6 +375,19 @@
       </div>
 
       <h4>Suggestions:</h4>
+      <input 
+  type="text" 
+  id="searchInput" 
+  placeholder="🔍 Search users by name, email, sport, city..." 
+  style="
+    width:100%;
+    padding:12px;
+    margin-bottom:20px;
+    border-radius:10px;
+    border:1px solid #E5E7EB;
+    font-size:14px;
+  "
+/>
 
       <div class="loading">
         <div class="spinner"></div>
@@ -384,10 +397,14 @@
       <div class="user-list"></div>
     </div>
 
-    <script>
+<script>
+let allUsers = [];
+let myLatitude = null;
+let myLongitude = null;
+
 const defaultIcon = "/uploads/icon.png";
 
-// Calculate distance (optional if both coordinates exist)
+// ================= DISTANCE =================
 function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371;
@@ -402,8 +419,8 @@ function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// Display all users
-function showUsers(users, myLat, myLng) {
+// ================= SHOW USERS =================
+function showUsers(users) {
   const listContainer = document.querySelector(".user-list");
   const loadingDiv = document.querySelector(".loading");
   listContainer.innerHTML = "";
@@ -421,17 +438,18 @@ function showUsers(users, myLat, myLng) {
 
   users.forEach((user) => {
     const dp = user.dp || defaultIcon;
+
     const dist = getDistanceFromLatLon(
-      myLat,
-      myLng,
+      myLatitude,
+      myLongitude,
       user.location?.latitude,
       user.location?.longitude
     );
 
     const card = document.createElement("div");
     card.className = "user-card";
-    
-    let statusButton = '';
+
+    let statusButton = "";
     if (user.requestStatus === "Friends") {
       statusButton = `<button class="add-friend-btn" disabled>✓ Friends</button>`;
     } else if (user.requestStatus === "Pending") {
@@ -439,30 +457,39 @@ function showUsers(users, myLat, myLng) {
     } else {
       statusButton = `<button class="add-friend-btn" onclick="sendFriendRequest('${user._id}', this)">+ Add Friend</button>`;
     }
-    
+
     card.innerHTML = `
       <img src="${dp}" alt="${user.name}">
+      
       <div class="user-info">
         <b>${user.name}</b>
+        
+        <span>📧 ${user.email || "No email"}</span>
+        <span>📍 ${user.city || "City"}, ${user.state || ""}</span>
         <span>🏀 Sport: ${user.interests || "Not specified"}</span>
+        <span>⚽ Fav: ${user.favSports || "Not specified"}</span>
+        <span>📝 ${user.about || "No bio"}</span>
+
         ${
           dist !== null
             ? `<span><span class="distance-badge">📍 ${dist.toFixed(2)} km away</span></span>`
             : `<span>📍 Distance: Not available</span>`
         }
       </div>
+
       <div class="action-buttons">
         ${statusButton}
         <a href="/chat/${user._id}" class="chat-btn">💬 Message</a>
       </div>
     `;
+
     listContainer.appendChild(card);
   });
 
   loadingDiv.style.display = "none";
 }
 
-// Send friend request
+// ================= FRIEND REQUEST =================
 function sendFriendRequest(toUserId, btn) {
   btn.textContent = "⏳ Pending";
   btn.disabled = true;
@@ -475,7 +502,6 @@ function sendFriendRequest(toUserId, btn) {
     .then((data) => {
       if (data.message === "Already friends") {
         btn.textContent = "✓ Friends";
-        btn.disabled = true;
       } else {
         btn.textContent = "⏳ Pending";
       }
@@ -488,81 +514,95 @@ function sendFriendRequest(toUserId, btn) {
     });
 }
 
-// Fetch all users from MongoDB
+// ================= LOAD USERS =================
 function loadAllUsers() {
   const loadingDiv = document.querySelector(".loading");
   const listContainer = document.querySelector(".user-list");
+
   loadingDiv.style.display = "flex";
   listContainer.innerHTML = "";
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const myLat = position.coords.latitude;
-        const myLng = position.coords.longitude;
+        myLatitude = position.coords.latitude;
+        myLongitude = position.coords.longitude;
 
-        // Optional: Save current location
+        // Save location
         fetch("/save-location", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ latitude: myLat, longitude: myLng }),
-        }).catch((err) => console.error(err));
+          body: JSON.stringify({
+            latitude: myLatitude,
+            longitude: myLongitude,
+          }),
+        });
 
-        // Fetch all users from MongoDB
         fetch("/api/locations")
           .then((res) => res.json())
-          .then((users) => showUsers(users, myLat, myLng))
-          .catch((err) => {
-            console.error(err);
-            loadingDiv.style.display = "none";
-            listContainer.innerHTML = `
-              <div class="empty-state">
-                <div class="empty-icon">⚠️</div>
-                <p>Failed to load users.</p>
-              </div>
-            `;
+          .then((users) => {
+            allUsers = users; // ✅ store users
+            showUsers(users);
           });
       },
       () => {
-        alert("Geolocation not supported or permission denied!");
-        loadingDiv.style.display = "none";
-        // Still load all users without location
         fetch("/api/locations")
           .then((res) => res.json())
-          .then((users) => showUsers(users, null, null))
-          .catch((err) => console.error(err));
+          .then((users) => {
+            allUsers = users;
+            showUsers(users);
+          });
       }
     );
   } else {
-    alert("Geolocation not supported by this browser.");
-    loadingDiv.style.display = "none";
-    // Load users without location
     fetch("/api/locations")
       .then((res) => res.json())
-      .then((users) => showUsers(users, null, null))
-      .catch((err) => console.error(err));
+      .then((users) => {
+        allUsers = users;
+        showUsers(users);
+      });
   }
 }
 
-// Initial load
+// ================= SEARCH =================
+document.getElementById("searchInput").addEventListener("input", function () {
+  const query = this.value.toLowerCase();
+
+  const filtered = allUsers.filter((user) => {
+    return (
+      user.name?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.city?.toLowerCase().includes(query) ||
+      user.state?.toLowerCase().includes(query) ||
+      user.interests?.toLowerCase().includes(query) ||
+      user.favSports?.toLowerCase().includes(query)
+    );
+  });
+
+  showUsers(filtered);
+});
+
+// ================= INIT =================
 loadAllUsers();
 
-// Add staggered animation to cards
+// ================= ANIMATION =================
 const observer = new MutationObserver(() => {
-  const cards = document.querySelectorAll('.user-card');
+  const cards = document.querySelectorAll(".user-card");
   cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    
+    card.style.opacity = "0";
+    card.style.transform = "translateY(20px)";
+
     setTimeout(() => {
-      card.style.transition = 'all 0.5s ease-out';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
+      card.style.transition = "all 0.5s ease-out";
+      card.style.opacity = "1";
+      card.style.transform = "translateY(0)";
     }, index * 100);
   });
 });
 
-observer.observe(document.querySelector('.user-list'), { childList: true });
-    </script>
+observer.observe(document.querySelector(".user-list"), {
+  childList: true,
+});
+</script>
   </body>
 </html>
